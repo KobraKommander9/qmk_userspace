@@ -1,3 +1,9 @@
 [submodule "sm_td"]
 	path = modules/sm_td
 	url = git@github.com:stasmarkin/sm_td.git
+[submodule "qmk_firmware"]
+	path = firmware/zsa
+	url = git@github.com:zsa/qmk_firmware.git
+[submodule "vial-qmk"]
+	path = firmware/vial
+	url = git@github.com:svalboard/vial-qmk.git
