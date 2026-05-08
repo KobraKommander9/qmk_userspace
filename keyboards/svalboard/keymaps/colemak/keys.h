@@ -1,14 +1,6 @@
 #pragma once
 
-#define HOME_A LGUI_T(KC_A)
-#define HOME_R LALT_T(KC_R)
-#define HOME_S LSFT_T(KC_S)
-#define HOME_T LCTL_T(KC_T)
-
-#define HOME_N RCTL_T(KC_N)
-#define HOME_E RSFT_T(KC_E)
-#define HOME_I LALT_T(KC_I)
-#define HOME_O RGUI_T(KC_O)
+#include "keymap_support.h"
 
 #define MKC_BKTAB S(KC_TAB)         // Back Tab
 #define MKC_APPWIN C(G(KC_DOWN))    // Show windows from current app
@@ -29,3 +21,47 @@
 #define SV_RDPU SV_RIGHT_DPI_INC
 #define SV_RDPD SV_RIGHT_DPI_DEC
 #define SV_SOUT SV_OUTPUT_STATUS
+
+typedef enum {
+    HRM_MODE_OFF,
+    HRM_MODE_LEFT,
+    HRM_MODE_RIGHT,
+    HRM_MODE_ON,
+    HRM_MODE_COUNT,
+} hrm_mode_t;
+
+typedef enum {
+    HRM_HAND_LEFT,
+    HRM_HAND_RIGHT,
+} hrm_hand_t;
+
+#define RANGE_START QK_KB_20
+enum custom_keycodes {
+    // left hand Home Row Mods
+    HRM_A = RANGE_START,
+    HRM_R,
+    HRM_S,
+    HRM_T,
+
+    // right hand Home Row Mods
+    HRM_N,
+    HRM_E,
+    HRM_I,
+    HRM_O,
+
+    // Home Row Mod toggles
+    HRM_TOGGLE,
+    HRM_CYCLE,
+};
+
+void init_hrm_eeprom(void);
+void setup_hrm_keys(void);
+
+#define HANDLE_HRM(tp_kc, mod_kc, hand) \
+    if (!hrm_active(hand)) { \
+        if (record->event.pressed) register_code(tap_kc); \
+        else unregister_code(tap_kc); \
+        return false; \
+    } \
+    record->keycode = mod_kc; \
+    return true;

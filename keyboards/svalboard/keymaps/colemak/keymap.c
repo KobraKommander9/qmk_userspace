@@ -5,6 +5,7 @@
 #include "quantum_keycodes.h"
 #include "keycodes.h"
 #include "modifiers.h"
+#include "eeprom.h"
 
 #include "keys.h"
 #include "layers.h"
@@ -12,15 +13,15 @@
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
         /*     Center            North               East                South             West                Double*/
-        /*R1*/ HOME_N            , KC_L              , KC_MINS           , KC_H            , KC_M              , XXXXXXX           ,
-        /*R2*/ HOME_E            , KC_U              , KC_EQL            , KC_COMMA        , KC_J              , XXXXXXX           ,
-        /*R3*/ HOME_I            , KC_Y              , KC_EXLM           , KC_DOT          , KC_K              , XXXXXXX           ,
-        /*R4*/ HOME_O            , KC_SCLN           , KC_RBRC           , KC_SLASH        , KC_RPRN           , XXXXXXX           ,
+        /*R1*/ HRM_N             , KC_L              , KC_MINS           , KC_H            , KC_M              , XXXXXXX           ,
+        /*R2*/ HRM_E             , KC_U              , KC_EQL            , KC_COMMA        , KC_J              , XXXXXXX           ,
+        /*R3*/ HRM_I             , KC_Y              , KC_EXLM           , KC_DOT          , KC_K              , XXXXXXX           ,
+        /*R4*/ HRM_O             , KC_SCLN           , KC_RBRC           , KC_SLASH        , KC_RPRN           , XXXXXXX           ,
 
-        /*L1*/ HOME_T            , KC_P              , KC_G              , KC_D            , KC_QUOT           , XXXXXXX           ,
-        /*L2*/ HOME_S            , KC_F              , KC_B              , KC_C            , KC_GRV            , XXXXXXX           ,
-        /*L3*/ HOME_R            , KC_W              , KC_V              , KC_X            , KC_BSLS           , XXXXXXX           ,
-        /*L4*/ HOME_A            , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
+        /*L1*/ HRM_T             , KC_P              , KC_G              , KC_D            , KC_QUOT           , XXXXXXX           ,
+        /*L2*/ HRM_S             , KC_F              , KC_B              , KC_C            , KC_GRV            , XXXXXXX           ,
+        /*L3*/ HRM_R             , KC_W              , KC_V              , KC_X            , KC_BSLS           , XXXXXXX           ,
+        /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
         /*RT*/ KC_ENTER          , KC_SPC            , KC_ESC            , XXXXXXX         , XXXXXXX           , XXXXXXX           ,
@@ -71,4 +72,33 @@ void keyboard_post_init_user(void) {
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_rgb_light_layer();
+    setup_hrm_keys();
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case HRM_CYCLE:
+            if (record->event.pressed) hrm_mode_cycle();
+            return false;
+
+        case HRM_TOGGLE:
+            if (record->event.pressed) hrm_mode_toggle();
+            return false;
+
+        case HRM_A: HANDLE_HRM(KC_A, LGUI_T(KC_A), HRM_HAND_LEFT);
+        case HRM_R: HANDLE_HRM(KC_R, LALT_T(KC_R), HRM_HAND_LEFT);
+        case HRM_S: HANDLE_HRM(KC_S, LSFT_T(KC_S), HRM_HAND_LEFT);
+        case HRM_T: HANDLE_HRM(KC_T, LCTL_T(KC_T), HRM_HAND_LEFT);
+
+        case HRM_N: HANDLE_HRM(KC_N, RCTL_T(KC_N), HRM_HAND_RIGHT);
+        case HRM_E: HANDLE_HRM(KC_E, RSFT_T(KC_E), HRM_HAND_RIGHT);
+        case HRM_I: HANDLE_HRM(KC_I, LALT_T(KC_I), HRM_HAND_RIGHT);
+        case HRM_O: HANDLE_HRM(KC_O, RGUI_T(KC_O), HRM_HAND_RIGHT);
+    }
+
+    return true;
+}
+
+void eeconfig_init_user(void) {
+    init_hrm_eeprom();
 }
