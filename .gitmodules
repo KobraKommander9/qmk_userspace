@@ -1,6 +1,3 @@
-[submodule "sm_td"]
-	path = modules/sm_td
-	url = git@github.com:stasmarkin/sm_td.git
 [submodule "zsa_qmk_firmware"]
 	path = firmware/zsa
 	url = git@github.com:KobraKommander9/zsa_qmk_firmware.git
