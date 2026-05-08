@@ -64,6 +64,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         ),
 };
 
+void eeconfig_init_user(void) {
+    init_hrm_eeprom();
+}
+
 void keyboard_post_init_user(void) {
     global_saved_values.left_scroll = true;
     global_saved_values.right_scroll = false;
@@ -82,6 +86,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void eeconfig_init_user(void) {
-    init_hrm_eeprom();
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+    state = set_default_rgb_light(state);
+
+    return state;
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    state = set_rgb_light(state);
+
+    // Disable auto-mouse when on the game layer
+    // if (layer_state_cmp(state, _GAM1) || layer_state_cmp(state, _GAM2)) {
+    //     global_saved_values.auto_mouse = false;
+    //     mouse_mode(false);
+    // } else {
+    //     global_saved_values.auto_mouse = true;
+    // }
+
+    return state;
 }

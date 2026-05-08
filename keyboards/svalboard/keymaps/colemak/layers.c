@@ -34,23 +34,15 @@ const rgblight_segment_t* const rgb_layers[] = RGBLIGHT_LAYERS_LIST(
     layer12_colors, layer13_colors, layer14_colors, layer15_colors
 );
 
-layer_state_t default_layer_state_set_user(layer_state_t state) {
+layer_state_t set_default_rgb_light(layer_state_t state) {
     rgblight_set_layer_state(0, layer_state_cmp(state, 0));
     return state;
 }
 
-layer_state_t layer_state_set_user(layer_state_t state) {
+layer_state_t set_rgb_light(layer_state_t state) {
     for (int i = 0; i < RGBLIGHT_LAYERS; ++i) {
         rgblight_set_layer_state(i, layer_state_cmp(state, i));
     }
-
-    // Disable auto-mouse when on the game layer
-    // if (layer_state_cmp(state, _GAM1) || layer_state_cmp(state, _GAM2)) {
-    //     global_saved_values.auto_mouse = false;
-    //     mouse_mode(false);
-    // } else {
-    //     global_saved_values.auto_mouse = true;
-    // }
 
     return state;
 }

@@ -14,3 +14,5 @@ enum layer_names {
 };
 
 void setup_rgb_light_layer(void);
+layer_state_t set_default_rgb_light(layer_state_t);
+layer_state_t set_rgb_light(layer_state_t);
