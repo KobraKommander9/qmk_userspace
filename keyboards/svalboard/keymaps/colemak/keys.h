@@ -24,19 +24,20 @@
 
 #define RANGE_START QK_KB_20
 enum custom_keycodes {
-    // left hand Home Row Mods
+    // Home Row Mods
     HRM_A = RANGE_START,
     HRM_R,
     HRM_S,
     HRM_T,
 
-    // right hand Home Row Mods
     HRM_N,
     HRM_E,
     HRM_I,
     HRM_O,
 
-    // Home Row Mod toggles
     HRM_TOGGLE,
     HRM_CYCLE,
+
+    // Tap Dances
+    CKC_SPC, // Space on tap, Number layer on hold
 };

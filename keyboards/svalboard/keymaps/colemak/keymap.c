@@ -10,6 +10,7 @@
 #include "keys.h"
 #include "hrm.h"
 #include "layers.h"
+#include "tap_dance.h"
 
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
@@ -25,7 +26,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ KC_ENTER          , KC_SPC            , KC_ESC            , XXXXXXX         , MO(_SYS)          , XXXXXXX           ,
+        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , XXXXXXX         , MO(_SYS)          , XXXXXXX           ,
         /*LT*/ KC_BSPC           , KC_SPC            , HRM_TOGGLE        , KC_TAB          , CW_TOGG           , XXXXXXX
         ),
 
@@ -99,6 +100,7 @@ void keyboard_post_init_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
+    if (!process_custom_dances(keycode, record)) return false;
 
     return true;
 }
