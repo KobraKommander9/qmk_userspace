@@ -25,8 +25,25 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ KC_ENTER          , KC_SPC            , KC_ESC            , XXXXXXX         , XXXXXXX           , XXXXXXX           ,
+        /*RT*/ KC_ENTER          , KC_SPC            , KC_ESC            , XXXXXXX         , MO(_SYS)          , XXXXXXX           ,
         /*LT*/ KC_BSPC           , KC_SPC            , HRM_TOGGLE        , KC_TAB          , CW_TOGG           , XXXXXXX
+        ),
+
+    [_NUM] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*L1*/ KC_KP_8,            KC_PPLS,            KC_KP_9,            KC_KP_4,            KC_PDOT,            XXXXXXX,
+        /*L2*/ KC_KP_7,            KC_PMNS,            KC_RPRN,            KC_KP_3,            KC_LPRN,            XXXXXXX,
+        /*L3*/ KC_KP_6,            KC_PAST,            KC_PEQL,            KC_KP_2,            KC_CIRC,            XXXXXXX,
+        /*L4*/ KC_KP_5,            KC_PSLS,            KC_COMM,            KC_KP_1,            KC_KP_0,            XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*LT*/ KC_PENT,            KC_BSPC,            _______,            KC_SPC,             KC_TAB,             XXXXXXX
         ),
 
     [_SYS] = LAYOUT(

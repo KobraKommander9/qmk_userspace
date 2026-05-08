@@ -3,6 +3,7 @@
 #include "color.h"
 
 #define BASE_GREEN      70, 200, 180
+#define NUM_BLUE        143, 255, 180
 #define SYS_RED         0, 255, 180
 #define MBO_MAGENTA     208, 255, 180
 
@@ -10,7 +11,7 @@ extern void mouse_mode(bool on);
 
 #define LAYER_COLOR(name, color) rgblight_segment_t const (name)[] = RGBLIGHT_LAYER_SEGMENTS({0, 2, color})
 LAYER_COLOR(layer0_colors, BASE_GREEN); // Base layer (#347156)
-LAYER_COLOR(layer1_colors, HSV_TEAL);
+LAYER_COLOR(layer1_colors, NUM_BLUE); // Numbers (#41687e)
 LAYER_COLOR(layer2_colors, HSV_TEAL);
 LAYER_COLOR(layer3_colors, HSV_TEAL);
 LAYER_COLOR(layer4_colors, HSV_TEAL);
