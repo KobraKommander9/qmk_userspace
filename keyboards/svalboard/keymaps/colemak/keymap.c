@@ -8,6 +8,7 @@
 #include "eeprom.h"
 
 #include "keys.h"
+#include "hrm.h"
 #include "layers.h"
 
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
@@ -25,7 +26,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
         /*RT*/ KC_ENTER          , KC_SPC            , KC_ESC            , XXXXXXX         , XXXXXXX           , XXXXXXX           ,
-        /*LT*/ KC_BSPC           , KC_SPC            , XXXXXXX           , KC_TAB          , CW_TOGG           , XXXXXXX
+        /*LT*/ KC_BSPC           , KC_SPC            , HRM_TOGGLE        , KC_TAB          , CW_TOGG           , XXXXXXX
         ),
 
     [_SYS] = LAYOUT(
@@ -76,25 +77,7 @@ void keyboard_post_init_user(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case HRM_CYCLE:
-            if (record->event.pressed) hrm_mode_cycle();
-            return false;
-
-        case HRM_TOGGLE:
-            if (record->event.pressed) hrm_mode_toggle();
-            return false;
-
-        case HRM_A: HANDLE_HRM(KC_A, LGUI_T(KC_A), HRM_HAND_LEFT);
-        case HRM_R: HANDLE_HRM(KC_R, LALT_T(KC_R), HRM_HAND_LEFT);
-        case HRM_S: HANDLE_HRM(KC_S, LSFT_T(KC_S), HRM_HAND_LEFT);
-        case HRM_T: HANDLE_HRM(KC_T, LCTL_T(KC_T), HRM_HAND_LEFT);
-
-        case HRM_N: HANDLE_HRM(KC_N, RCTL_T(KC_N), HRM_HAND_RIGHT);
-        case HRM_E: HANDLE_HRM(KC_E, RSFT_T(KC_E), HRM_HAND_RIGHT);
-        case HRM_I: HANDLE_HRM(KC_I, LALT_T(KC_I), HRM_HAND_RIGHT);
-        case HRM_O: HANDLE_HRM(KC_O, RGUI_T(KC_O), HRM_HAND_RIGHT);
-    }
+    if (!process_hrm(keycode, record)) return false;
 
     return true;
 }

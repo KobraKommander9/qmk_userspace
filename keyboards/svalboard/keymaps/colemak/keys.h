@@ -22,19 +22,6 @@
 #define SV_RDPD SV_RIGHT_DPI_DEC
 #define SV_SOUT SV_OUTPUT_STATUS
 
-typedef enum {
-    HRM_MODE_OFF,
-    HRM_MODE_LEFT,
-    HRM_MODE_RIGHT,
-    HRM_MODE_ON,
-    HRM_MODE_COUNT,
-} hrm_mode_t;
-
-typedef enum {
-    HRM_HAND_LEFT,
-    HRM_HAND_RIGHT,
-} hrm_hand_t;
-
 #define RANGE_START QK_KB_20
 enum custom_keycodes {
     // left hand Home Row Mods
@@ -53,15 +40,3 @@ enum custom_keycodes {
     HRM_TOGGLE,
     HRM_CYCLE,
 };
-
-void init_hrm_eeprom(void);
-void setup_hrm_keys(void);
-
-#define HANDLE_HRM(tp_kc, mod_kc, hand) \
-    if (!hrm_active(hand)) { \
-        if (record->event.pressed) register_code(tap_kc); \
-        else unregister_code(tap_kc); \
-        return false; \
-    } \
-    record->keycode = mod_kc; \
-    return true;
