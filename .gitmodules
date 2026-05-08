@@ -4,3 +4,6 @@
 [submodule "vial-qmk"]
 	path = firmware/vial
 	url = git@github.com:KobraKommander9/vial-qmk.git
+[submodule "modules/sm_td"]
+	path = modules/stasmarkin
+	url = git@github.com:stasmarkin/sm_td.git
