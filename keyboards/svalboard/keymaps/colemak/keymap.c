@@ -25,8 +25,42 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , XXXXXXX         , MO(_SYS)          , XXXXXXX           ,
+        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , XXXXXXX         , MO(_SYS)          , TO(_GAME1)        ,
         /*LT*/ KC_BSPC           , KC_SPC            , HRM_TOGGLE        , KC_TAB          , CW_TOGG           , XXXXXXX
+        ),
+
+    [_GAME1] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_B,               XXXXXXX,            XXXXXXX,
+        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_Y,               XXXXXXX,            XXXXXXX,
+        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_G,               XXXXXXX,            XXXXXXX,
+        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_N,               XXXXXXX,            XXXXXXX,
+
+        /*L1*/ KC_D,               KC_E,               KC_R,               KC_V,               KC_T,               XXXXXXX,
+        /*L2*/ KC_W,               KC_C,               KC_F,               KC_S,               KC_U,               XXXXXXX,
+        /*L3*/ KC_A,               KC_Q,               KC_X,               KC_M,               KC_Z,               XXXXXXX,
+        /*L4*/ KC_LSFT,            KC_LOPT,            KC_GRV,             KC_LCTL,            KC_H,               XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ KC_BTN2,            KC_BTN1,            KC_ESC,             KC_WH_U,            KC_WH_D,            TO(_BASE),
+        /*LT*/ MO(_GAME2),         KC_SPC,             KC_ESC,             KC_TAB,             KC_LCMD,            TO(_BASE)
+        ),
+
+    [_GAME2] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_F1,              XXXXXXX,            XXXXXXX,
+        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_F2,              XXXXXXX,            XXXXXXX,
+        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_F3,              XXXXXXX,            XXXXXXX,
+        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_F4,              XXXXXXX,            XXXXXXX,
+
+        /*L1*/ KC_6,               KC_9,               KC_0,               KC_3,               XXXXXXX,            XXXXXXX,
+        /*L2*/ KC_5,               KC_8,               XXXXXXX,            KC_2,               XXXXXXX,            XXXXXXX,
+        /*L3*/ KC_4,               KC_7,               XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
+        /*L4*/ KC_F6,              KC_F7,              KC_F9,              KC_F5,              KC_F8,              XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ _______,            _______,            _______,            _______,            _______,            _______,
+        /*LT*/ XXXXXXX,            _______,            _______,            _______,            _______,            _______
         ),
 
     [_NUM] = LAYOUT(
@@ -113,12 +147,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     state = set_rgb_light(state);
 
     // Disable auto-mouse when on the game layer
-    // if (layer_state_cmp(state, _GAM1) || layer_state_cmp(state, _GAM2)) {
-    //     global_saved_values.auto_mouse = false;
-    //     mouse_mode(false);
-    // } else {
-    //     global_saved_values.auto_mouse = true;
-    // }
+    if (layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2)) {
+        global_saved_values.auto_mouse = false;
+    } else {
+        global_saved_values.auto_mouse = true;
+    }
 
     return state;
 }
