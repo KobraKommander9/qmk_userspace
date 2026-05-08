@@ -63,6 +63,23 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*LT*/ XXXXXXX,            _______,            _______,            _______,            _______,            _______
         ),
 
+    [_NAV] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ KC_LEFT,            MKC_DKTP,           KC_END,             KC_LPAD,            KC_HOME,            XXXXXXX,
+        /*R2*/ KC_DOWN,            MKC_APPWIN,         A(KC_RGHT),         MKC_SHDKT,          A(KC_LEFT),         XXXXXXX,
+        /*R3*/ KC_UP,              KC_MCTL,            G(KC_RGHT),         MKC_SHNOT,          G(KC_LEFT),         XXXXXXX,
+        /*R4*/ KC_RIGHT,           MKC_DKTN,           KC_PGDN,            MKC_SPFND,          KC_PGUP,            XXXXXXX,
+
+        /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ XXXXXXX,            KC_TAB,             XXXXXXX,            MKC_BKTAB,          XXXXXXX,            XXXXXXX,
+        /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+        ),
+
     [_NUM] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
         /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
@@ -78,6 +95,23 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*LT*/ KC_PENT,            KC_BSPC,            _______,            KC_SPC,             KC_TAB,             XXXXXXX
+        ),
+
+    [_SYM] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ _______,            KC_SPC,             QK_REP,             KC_BSPC,            KC_TAB,             XXXXXXX,
+        /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
         ),
 
     [_SYS] = LAYOUT(
@@ -113,6 +147,23 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*RT*/ _______           , _______           , _______           , _______           , _______           , SV_SNIPER_5             ,
         /*LT*/ _______           , _______           , _______           , _______           , _______           , SV_SNIPER_3
         ),
+
+    // [_TMP] = LAYOUT(
+    //     /*     Center              North               East                South               West                Double*/
+    //     /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //
+    //     /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //
+    //     /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+    //     /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+    //     ),
 };
 
 void eeconfig_init_user(void) {

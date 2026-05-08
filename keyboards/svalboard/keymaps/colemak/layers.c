@@ -5,6 +5,7 @@
 #define BASE_GREEN      70, 200, 180
 #define GAME1_BLUE      153, 255, 180
 #define GAME2_BLUE      137, 255, 180
+#define NAV_ORANGE      20, 255, 180
 #define NUM_BLUE        143, 255, 180
 #define SYS_RED         0, 255, 180
 #define MBO_MAGENTA     208, 255, 180
@@ -12,12 +13,12 @@
 extern void mouse_mode(bool on);
 
 #define LAYER_COLOR(name, color) rgblight_segment_t const (name)[] = RGBLIGHT_LAYER_SEGMENTS({0, 2, color})
-LAYER_COLOR(layer0_colors, BASE_GREEN); // Base layer (#347156)
-LAYER_COLOR(layer1_colors, GAME1_BLUE); // Game1 (#355a93)
-LAYER_COLOR(layer2_colors, GAME2_BLUE); // Game2 (#0c7595)
-LAYER_COLOR(layer3_colors, NUM_BLUE); // Numbers (#41687e)
-LAYER_COLOR(layer4_colors, HSV_TEAL);
-LAYER_COLOR(layer5_colors, HSV_TEAL);
+LAYER_COLOR(layer0_colors, BASE_GREEN);
+LAYER_COLOR(layer1_colors, GAME1_BLUE);
+LAYER_COLOR(layer2_colors, GAME2_BLUE);
+LAYER_COLOR(layer3_colors, NAV_ORANGE);
+LAYER_COLOR(layer4_colors, NUM_BLUE);
+LAYER_COLOR(layer5_colors, HSV_CORAL);
 LAYER_COLOR(layer6_colors, HSV_TEAL);
 LAYER_COLOR(layer7_colors, HSV_TEAL);
 LAYER_COLOR(layer8_colors, HSV_TEAL);
@@ -26,8 +27,8 @@ LAYER_COLOR(layer10_colors, HSV_TEAL);
 LAYER_COLOR(layer11_colors, HSV_TEAL);
 LAYER_COLOR(layer12_colors, HSV_TEAL);
 LAYER_COLOR(layer13_colors, HSV_TEAL);
-LAYER_COLOR(layer14_colors, SYS_RED); // System (#9C2927)
-LAYER_COLOR(layer15_colors, MBO_MAGENTA); // Mouse layer (#8C3396)
+LAYER_COLOR(layer14_colors, SYS_RED);
+LAYER_COLOR(layer15_colors, MBO_MAGENTA);
 #undef LAYER_COLOR
 
 const rgblight_segment_t* const rgb_layers[] = RGBLIGHT_LAYERS_LIST(
