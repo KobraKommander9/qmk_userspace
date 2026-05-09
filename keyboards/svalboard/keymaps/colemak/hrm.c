@@ -29,7 +29,7 @@ void setup_hrm_keys() {
     }
 }
 
-static bool hrm_active(hrm_hand_t hand) {
+bool hrm_active(hrm_hand_t hand) {
     switch (user_config.hrm_mode) {
         case HRM_MODE_ON: return true;
         case HRM_MODE_OFF: return false;
@@ -57,15 +57,6 @@ static void hrm_mode_toggle(void) {
     eeconfig_update_user(user_config.raw);
 }
 
-#define HANDLE_HRM(tap_kc, mod_kc, hand) \
-    if (!hrm_active(hand)) { \
-        if (record->event.pressed) register_code(tap_kc); \
-        else unregister_code(tap_kc); \
-        return false; \
-    } \
-    record->keycode = mod_kc; \
-    return true;
-
 bool process_hrm(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case HRM_CYCLE:
@@ -75,16 +66,6 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
         case HRM_TOGGLE:
             if (record->event.pressed) hrm_mode_toggle();
             return false;
-
-        case HRM_A: HANDLE_HRM(KC_A, LGUI(KC_A), HRM_HAND_LEFT);
-        case HRM_R: HANDLE_HRM(KC_R, LALT(KC_R), HRM_HAND_LEFT);
-        case HRM_S: HANDLE_HRM(KC_S, LSFT(KC_S), HRM_HAND_LEFT);
-        case HRM_T: HANDLE_HRM(KC_T, LCTL(KC_T), HRM_HAND_LEFT);
-
-        case HRM_N: HANDLE_HRM(KC_N, RCTL(KC_N), HRM_HAND_RIGHT);
-        case HRM_E: HANDLE_HRM(KC_E, RSFT(KC_E), HRM_HAND_RIGHT);
-        case HRM_I: HANDLE_HRM(KC_I, LALT(KC_I), HRM_HAND_RIGHT);
-        case HRM_O: HANDLE_HRM(KC_O, RGUI(KC_O), HRM_HAND_RIGHT);
     }
 
     return true;

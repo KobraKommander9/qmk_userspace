@@ -184,6 +184,7 @@ void keyboard_post_init_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
+    if (!process_smtd(keycode, record)) return false;
 
     return true;
 }
