@@ -201,6 +201,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     // Disable auto-mouse when on the game layer
     if (layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2)) {
         global_saved_values.auto_mouse = false;
+        mouse_mode(false);
     } else {
         global_saved_values.auto_mouse = true;
     }

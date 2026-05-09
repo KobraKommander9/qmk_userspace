@@ -24,8 +24,8 @@ void init_hrm_eeprom() {
 
 void setup_hrm_keys() {
     user_config.raw = eeconfig_read_user();
-    if (user_config.hrm_mode >= HRM_MODE_COUNT) {
-        user_config.hrm_mode = HRM_MODE_ON;
+    if (user_config.raw == 0 || user_config.hrm_mode >= HRM_MODE_COUNT) {
+        init_hrm_eeprom();
     }
 }
 

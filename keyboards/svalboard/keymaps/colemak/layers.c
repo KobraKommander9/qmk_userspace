@@ -39,15 +39,18 @@ const rgblight_segment_t* const rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 );
 
 layer_state_t set_default_rgb_light(layer_state_t state) {
-    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
+    layer_state_t combined = layer_state | state;
+    for (int i = 0; i < RGBLIGHT_LAYERS; ++i) {
+        rgblight_set_layer_state(i, layer_state_cmp(combined, i));
+    }
     return state;
 }
 
 layer_state_t set_rgb_light(layer_state_t state) {
+    layer_state_t combined = state | default_layer_state;
     for (int i = 0; i < RGBLIGHT_LAYERS; ++i) {
-        rgblight_set_layer_state(i, layer_state_cmp(state, i));
+        rgblight_set_layer_state(i, layer_state_cmp(combined, i));
     }
-
     return state;
 }
 

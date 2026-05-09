@@ -42,3 +42,5 @@ enum custom_keycodes {
     CKC_SPC, // Space on tap, numbers layer on hold
     CKC_TAB, // Tab on tap, symbols layer on hold
 };
+
+extern void mouse_mode(bool on);
