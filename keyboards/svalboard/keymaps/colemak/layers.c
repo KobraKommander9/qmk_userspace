@@ -56,4 +56,5 @@ layer_state_t set_rgb_light(layer_state_t state) {
 
 void setup_rgb_light_layer() {
     rgblight_layers = rgb_layers;
+    set_default_rgb_light(default_layer_state);
 }
