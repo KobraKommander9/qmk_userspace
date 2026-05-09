@@ -31,9 +31,9 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_GAME1] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
-        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_B,               XXXXXXX,            XXXXXXX,
-        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_Y,               XXXXXXX,            XXXXXXX,
-        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_G,               XXXXXXX,            XXXXXXX,
+        /*R1*/ KC_LEFT,            XXXXXXX,            XXXXXXX,            KC_B,               XXXXXXX,            XXXXXXX,
+        /*R2*/ KC_DOWN,            KC_UP,              XXXXXXX,            KC_Y,               XXXXXXX,            XXXXXXX,
+        /*R3*/ KC_RIGHT,           XXXXXXX,            XXXXXXX,            KC_G,               XXXXXXX,            XXXXXXX,
         /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            KC_N,               XXXXXXX,            XXXXXXX,
 
         /*L1*/ KC_D,               KC_E,               KC_R,               KC_V,               KC_T,               XXXXXXX,
