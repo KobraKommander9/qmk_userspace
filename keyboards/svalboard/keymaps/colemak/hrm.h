@@ -15,7 +15,6 @@ typedef enum {
     HRM_HAND_RIGHT,
 } hrm_hand_t;
 
-
 void init_hrm_eeprom(void);
 void setup_hrm_keys(void);
 bool process_hrm(uint16_t, keyrecord_t*);

@@ -4,7 +4,8 @@
 
 smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
     switch (keycode) {
-        case CKC_SPC: SMTD_LT(KC_SPC, _NUM); break;
+        SMTD_LT(CKC_SPC, KC_SPC, _NUM)
+        SMTD_LT(CKC_TAB, KC_TAB, _SYM)
     }
 
     return SMTD_RESOLUTION_UNHANDLED;

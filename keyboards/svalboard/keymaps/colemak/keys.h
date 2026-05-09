@@ -39,5 +39,6 @@ enum custom_keycodes {
     HRM_CYCLE,
 
     // Tap Dances
-    CKC_SPC, // Space on tap, Number layer on hold
+    CKC_SPC, // Space on tap, numbers layer on hold
+    CKC_TAB, // Tab on tap, symbols layer on hold
 };

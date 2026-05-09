@@ -76,15 +76,15 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) hrm_mode_toggle();
             return false;
 
-        case HRM_A: HANDLE_HRM(KC_A, LGUI_T(KC_A), HRM_HAND_LEFT);
-        case HRM_R: HANDLE_HRM(KC_R, LALT_T(KC_R), HRM_HAND_LEFT);
-        case HRM_S: HANDLE_HRM(KC_S, LSFT_T(KC_S), HRM_HAND_LEFT);
-        case HRM_T: HANDLE_HRM(KC_T, LCTL_T(KC_T), HRM_HAND_LEFT);
+        case HRM_A: HANDLE_HRM(KC_A, LGUI(KC_A), HRM_HAND_LEFT);
+        case HRM_R: HANDLE_HRM(KC_R, LALT(KC_R), HRM_HAND_LEFT);
+        case HRM_S: HANDLE_HRM(KC_S, LSFT(KC_S), HRM_HAND_LEFT);
+        case HRM_T: HANDLE_HRM(KC_T, LCTL(KC_T), HRM_HAND_LEFT);
 
-        case HRM_N: HANDLE_HRM(KC_N, RCTL_T(KC_N), HRM_HAND_RIGHT);
-        case HRM_E: HANDLE_HRM(KC_E, RSFT_T(KC_E), HRM_HAND_RIGHT);
-        case HRM_I: HANDLE_HRM(KC_I, LALT_T(KC_I), HRM_HAND_RIGHT);
-        case HRM_O: HANDLE_HRM(KC_O, RGUI_T(KC_O), HRM_HAND_RIGHT);
+        case HRM_N: HANDLE_HRM(KC_N, RCTL(KC_N), HRM_HAND_RIGHT);
+        case HRM_E: HANDLE_HRM(KC_E, RSFT(KC_E), HRM_HAND_RIGHT);
+        case HRM_I: HANDLE_HRM(KC_I, LALT(KC_I), HRM_HAND_RIGHT);
+        case HRM_O: HANDLE_HRM(KC_O, RGUI(KC_O), HRM_HAND_RIGHT);
     }
 
     return true;
