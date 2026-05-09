@@ -8,6 +8,7 @@ VIAL_INSECURE ?= yes
 VPATH += keyboards/svalboard/keymaps
 SRC += keymap_support.c
 
+SRC += persist.c
 SRC += hrm.c
 SRC += layers.c
 SRC += smtd.c

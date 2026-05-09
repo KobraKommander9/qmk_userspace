@@ -6,6 +6,7 @@
 #include "keycodes.h"
 #include "modifiers.h"
 #include "eeprom.h"
+#include "svalboard.h"
 
 #include "keys.h"
 #include "hrm.h"
@@ -178,27 +179,17 @@ void keyboard_post_init_user(void) {
     global_saved_values.right_dpi_index = MOUSE_DPI_1200;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
-    setup_rgb_light_layer();
     setup_hrm_keys();
+    // setup_rgb_colors();
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
-    if (!process_smtd(keycode, record)) return false;
 
     return true;
 }
 
-layer_state_t default_layer_state_set_user(layer_state_t state) {
-    state = set_default_rgb_light(state);
-
-    return state;
-}
-
 layer_state_t layer_state_set_user(layer_state_t state) {
-    state = set_rgb_light(state);
-
-    // Disable auto-mouse when on the game layer
     if (layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2)) {
         global_saved_values.auto_mouse = false;
         mouse_mode(false);

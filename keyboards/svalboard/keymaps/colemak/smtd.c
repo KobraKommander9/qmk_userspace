@@ -42,7 +42,6 @@
     } else {                                    \
         SMTD_UNREGISTER_16(false, tap_kc);      \
     }
-}
 
 #define CUSTOM_LT(macro_key, tap_kc, layer)     \
     SMTD_DANCE(macro_key,                       \
