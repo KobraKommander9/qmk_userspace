@@ -15,7 +15,7 @@
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
         /*     Center            North               East                South             West                Double*/
-        /*R1*/ HRM_N             , KC_L              , KC_MINS           , KC_H            , KC_M              , XXXXXXX           ,
+        /*R1*/ HRM_N             , KC_L              , KC_MINS           , KC_M            , KC_H              , XXXXXXX           ,
         /*R2*/ HRM_E             , KC_U              , KC_EQL            , KC_COMMA        , KC_J              , XXXXXXX           ,
         /*R3*/ HRM_I             , KC_Y              , KC_EXLM           , KC_DOT          , KC_K              , XXXXXXX           ,
         /*R4*/ HRM_O             , KC_SCLN           , KC_RBRC           , KC_SLASH        , KC_RPRN           , XXXXXXX           ,
@@ -26,8 +26,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ CKC_SPC           , KC_ENTER          , KC_ESC            , CW_TOGG         , MO(_SYS)          , XXXXXXX           ,
-        /*LT*/ CKC_BSPC          , KC_SPC            , HRM_TOGGLE        , CKC_TAB         , TO(_GAME1)        , XXXXXXX
+        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CW_TOGG         , MO(_SYS)          , XXXXXXX           ,
+        /*LT*/ KC_SPC            , CKC_BSPC          , XXXXXXX           , CKC_TAB         , TO(_GAME1)        , HRM_TOGGLE
         ),
 
     [_GAME1] = LAYOUT(
@@ -88,10 +88,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
-        /*L1*/ KC_KP_8,            KC_PPLS,            KC_KP_9,            KC_KP_4,            KC_PDOT,            XXXXXXX,
-        /*L2*/ KC_KP_7,            KC_PMNS,            KC_RPRN,            KC_KP_3,            KC_LPRN,            XXXXXXX,
-        /*L3*/ KC_KP_6,            KC_PAST,            KC_PEQL,            KC_KP_2,            KC_CIRC,            XXXXXXX,
-        /*L4*/ KC_KP_5,            KC_PSLS,            KC_COMM,            KC_KP_1,            KC_KP_0,            XXXXXXX,
+        /*L1*/ KC_KP_6,            KC_KP_9,            KC_KP_0,            KC_KP_3,            KC_PEQL,            XXXXXXX,
+        /*L2*/ KC_KP_5,            KC_KP_8,            XXXXXXX,            KC_KP_2,            KC_PSLS,            XXXXXXX,
+        /*L3*/ KC_KP_4,            KC_KP_7,            XXXXXXX,            KC_KP_1,            KC_PCMM,            XXXXXXX,
+        /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_PDOT,            XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
@@ -145,8 +145,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ _______           , _______           , _______           , _______           , _______           , XXXXXXX             ,
 
         /*     Down               Pad                Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_BTN1           , KC_BTN2           , _______           , _______           , _______           , SV_SNIPER_5         ,
-        /*LT*/ KC_BTN1           , KC_BTN2           , _______           , _______           , _______           , SV_SNIPER_3
+        /*RT*/ KC_BTN2           , KC_BTN2           , _______           , _______           , _______           , SV_SNIPER_5         ,
+        /*LT*/ KC_BTN2           , KC_BTN1           , _______           , _______           , _______           , SV_SNIPER_3
         ),
 
     // [_TMP] = LAYOUT(
