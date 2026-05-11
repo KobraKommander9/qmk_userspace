@@ -145,7 +145,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ _______           , _______           , _______           , _______           , _______           , XXXXXXX             ,
 
         /*     Down               Pad                Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_BTN2           , KC_BTN2           , _______           , _______           , _______           , SV_SNIPER_5         ,
+        /*RT*/ KC_BTN2           , KC_BTN1           , _______           , _______           , _______           , SV_SNIPER_5         ,
         /*LT*/ KC_BTN2           , KC_BTN1           , _______           , _______           , _______           , SV_SNIPER_3
         ),
 
