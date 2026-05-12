@@ -71,10 +71,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*R3*/ KC_UP,              KC_MCTL,            G(KC_RGHT),         MKC_SHNOT,          G(KC_LEFT),         XXXXXXX,
         /*R4*/ KC_RIGHT,           MKC_DKTN,           KC_PGDN,            MKC_SPFND,          KC_PGUP,            XXXXXXX,
 
-        /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ KC_LALT,            KC_TAB,             XXXXXXX,            MKC_BKTAB,          XXXXXXX,            XXXXXXX,
@@ -83,10 +83,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_NUM] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
-        /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*R2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*R3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*R4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*L1*/ KC_KP_6,            KC_KP_9,            KC_KP_0,            KC_KP_3,            KC_PEQL,            XXXXXXX,
         /*L2*/ KC_KP_5,            KC_KP_8,            XXXXXXX,            KC_KP_2,            KC_PSLS,            XXXXXXX,
@@ -105,10 +105,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*R3*/ KC_RCBR,            KC_GT,              KC_PERC,            KC_RBRC,            KC_EXLM,            XXXXXXX,
         /*R4*/ KC_AT,              KC_UNDS,            KC_BSLS,            KC_HASH,            KC_SLSH,            XXXXXXX,
 
-        /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,            KC_SPC,             QK_REP,             KC_BSPC,            KC_TAB,             XXXXXXX,
@@ -146,7 +146,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down               Pad                Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ KC_BTN2           , KC_BTN1           , _______           , _______           , _______           , SV_SNIPER_5         ,
-        /*LT*/ KC_BTN2           , KC_BTN1           , _______           , _______           , _______           , SV_SNIPER_3
+        /*LT*/ KC_BTN2           , KC_BTN1           , _______           , SV_SNIPER_3       , _______           , SV_SNIPER_3
         ),
 
     // [_TMP] = LAYOUT(
