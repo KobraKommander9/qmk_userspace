@@ -10,12 +10,6 @@
 #define MKC_SHNOT A(G(KC_UP))       // Show Notification Center
 #define MKC_SPFND A(G(KC_RIGHT))    // Spotlight Find
 
-// Indices into dpi_choices[]: {200,400,600,800,1200,...}
-#define MOUSE_DPI_400  1
-#define MOUSE_DPI_1200 4
-// Index into mh_timer_choices[]: {200,300,400,500,800,-1}; -1 = no timeout
-#define MOUSE_LAYER_TIMEOUT_NONE 5
-
 #define SV_LDPU SV_LEFT_DPI_INC
 #define SV_LDPD SV_LEFT_DPI_DEC
 #define SV_RDPU SV_RIGHT_DPI_INC
