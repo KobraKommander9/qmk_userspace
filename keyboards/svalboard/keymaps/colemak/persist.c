@@ -6,7 +6,6 @@ typedef union {
     struct {
         hrm_mode_t hrm_mode        : 3;
         hrm_mode_t hrm_last_mode   : 3;
-        bool       colors_initialized : 1;
     };
 } user_config_t;
 
@@ -20,7 +19,6 @@ void persist_reset(void) {
     user_config.raw               = 0;
     user_config.hrm_mode          = HRM_MODE_ON;
     user_config.hrm_last_mode     = HRM_MODE_ON;
-    user_config.colors_initialized = false;
     persist_write();
 }
 
@@ -46,14 +44,5 @@ void persist_set_hrm_mode(hrm_mode_t mode) {
 
 void persist_set_hrm_last_mode(hrm_mode_t mode) {
     user_config.hrm_last_mode = mode;
-    persist_write();
-}
-
-bool persist_colors_initialized(void) {
-    return user_config.colors_initialized;
-}
-
-void persist_mark_colors_initialized(void) {
-    user_config.colors_initialized = true;
     persist_write();
 }

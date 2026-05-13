@@ -2,21 +2,20 @@
 #include "persist.h"
 #include "svalboard.h"
 
-void setup_rgb_colors(void) {
-    if (persist_colors_initialized()) return;
+#define HSV(c) (struct layer_hsv) { (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF}
 
-    global_saved_values.layer_colors[_BASE]  = (struct layer_hsv){  70, 200, 180 };
-    global_saved_values.layer_colors[_GAME1] = (struct layer_hsv){ 153, 255, 180 };
-    global_saved_values.layer_colors[_GAME2] = (struct layer_hsv){ 137, 255, 180 };
-    global_saved_values.layer_colors[_NAV]   = (struct layer_hsv){  20, 255, 180 };
-    global_saved_values.layer_colors[_NUM]   = (struct layer_hsv){ 143, 255, 180 };
-    global_saved_values.layer_colors[_SYM]   = (struct layer_hsv){  11, 176, 255 };
+void setup_rgb_colors(void) {
+    global_saved_values.layer_colors[_BASE] = HSV(0x55FFFF);
+    global_saved_values.layer_colors[_GAME1] = HSV(0xAAE0FF);
+    global_saved_values.layer_colors[_GAME2] = HSV(0x95E0FF);
+    global_saved_values.layer_colors[_NAV]   = HSV(0x80FFFF);
+    global_saved_values.layer_colors[_NUM]   = HSV(0x2BFFFF);
+    global_saved_values.layer_colors[_SYM]   = HSV(0xD5FFFF);
     for (int i = _SYM + 1; i < _SYS; i++) {
-        global_saved_values.layer_colors[i]  = (struct layer_hsv){ 128, 255, 128 };
+        global_saved_values.layer_colors[i]  = HSV(0x00FFFF);
     }
-    global_saved_values.layer_colors[_SYS]   = (struct layer_hsv){   0, 255, 180 };
-    global_saved_values.layer_colors[_MBO]   = (struct layer_hsv){ 208, 255, 180 };
+    global_saved_values.layer_colors[_SYS]   = HSV(0x15FFFF);
+    global_saved_values.layer_colors[_MBO]   = HSV(0xEAFFFF);
 
     write_eeprom_kb();
-    persist_mark_colors_initialized();
 }

@@ -182,7 +182,7 @@ void keyboard_post_init_user(void) {
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_hrm_keys();
-    // setup_rgb_colors();
+    setup_rgb_colors();
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {

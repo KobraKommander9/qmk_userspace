@@ -10,6 +10,3 @@ hrm_mode_t persist_get_hrm_mode(void);
 hrm_mode_t persist_get_hrm_last_mode(void);
 void       persist_set_hrm_mode(hrm_mode_t mode);
 void       persist_set_hrm_last_mode(hrm_mode_t mode);
-
-bool persist_colors_initialized(void);
-void persist_mark_colors_initialized(void);
