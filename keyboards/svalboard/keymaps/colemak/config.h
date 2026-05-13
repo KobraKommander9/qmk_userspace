@@ -16,8 +16,10 @@
 #endif
 
 #undef TAPPING_TERM
-#define TAPPING_TERM 200
+#define TAPPING_TERM 260
 
 #ifndef TAPPING_TERM_PER_KEY
 #define TAPPING_TERM_PER_KEY
 #endif
+
+#undef PERMISSIVE_HOLD

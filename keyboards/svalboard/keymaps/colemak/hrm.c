@@ -21,6 +21,16 @@ static void hrm_mode_toggle(void) {
 // ----------------------------------------------------------------------------
 
 uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
+    switch (keycode) {
+        case HRM_S:
+        case HRM_E:
+            return TAPPING_TERM - 50;
+
+        case HRM_R:
+        case HRM_I:
+            return TAPPING_TERM - 20;
+    }
+
     return TAPPING_TERM + 20;
 }
 
