@@ -3,11 +3,17 @@
 #include "layers.h"
 #include "hrm.h"
 
-#define IS_CAPS is_caps_word_on() || host_led_state().caps_lock
+#define CAPS_ACTIVE (is_caps_word_on() || host_led_state().caps_lock)
+#define SHIFT_ACTIVE (!!(get_mods() & MOD_MASK_SHIFT))
+#define SHOULD_CAPS (CAPS_ACTIVE ^ SHIFT_ACTIVE)
 
-#define CUSTOM_TAP(kc) tap_code16(IS_CAPS ? LSFT(kc) : kc); mouse_mode(false)
-#define CUSTOM_REG(kc) register_code16(IS_CAPS ? LSFT(kc) : kc)
-#define CUSTOM_UNREG(kc) unregister_code16(IS_CAPS ? LSFT(kc) : kc); mouse_mode(false)
+#define ALPHA_TAP(kc) tap_code16(SHOULD_CAPS ? LSFT(kc) : kc); mouse_mode(false)
+#define ALPHA_REG(kc) register_code16(SHOULD_CAPS ? LSFT(kc) : kc)
+#define ALPHA_UNREG(kc) unregister_code16(SHOULD_CAPS ? LSFT(kc) : kc); mouse_mode(false)
+
+#define CUSTOM_TAP(kc) tap_code16(CAPS_ACTIVE ? LSFT(kc) : kc); mouse_mode(false)
+#define CUSTOM_REG(kc) register_code16(CAPS_ACTIVE ? LSFT(kc) : kc)
+#define CUSTOM_UNREG(kc) unregister_code16(CAPS_ACTIVE ? LSFT(kc) : kc); mouse_mode(false)
 
 #define SHIFT_ACTION(normal_action, shift_action)   \
     if (mods & MOD_MASK_SHIFT) {                    \
@@ -73,19 +79,19 @@
 #define HRM_SMTD_CASE(macro_key, tap_kc, mod_kc, hand)  \
     SMTD_DANCE(macro_key,                               \
         NOTHING,                                        \
-        CUSTOM_TAP(tap_kc),                             \
+        ALPHA_TAP(tap_kc),                              \
         SMTD_LIMIT(1,                                   \
             HRM_ACTIVE(hand,                            \
                 register_mods(MOD_BIT(mod_kc));         \
                 send_keyboard_report(),                 \
-                CUSTOM_REG(tap_kc)),                    \
-            CUSTOM_REG(tap_kc)),                        \
+                ALPHA_REG(tap_kc)),                     \
+            ALPHA_REG(tap_kc)),                         \
         SMTD_LIMIT(1,                                   \
             HRM_ACTIVE(hand,                            \
                 unregister_mods(MOD_BIT(mod_kc));       \
                 send_keyboard_report(),                 \
-                CUSTOM_UNREG(tap_kc)),                  \
-            CUSTOM_UNREG(tap_kc));                      \
+                ALPHA_UNREG(tap_kc)),                   \
+            ALPHA_UNREG(tap_kc));                       \
             send_keyboard_report())
 
 smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
