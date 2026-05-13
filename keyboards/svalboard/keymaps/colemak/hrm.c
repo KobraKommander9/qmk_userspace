@@ -2,12 +2,8 @@
 #include "keys.h"
 #include "persist.h"
 
-void init_hrm_eeprom(void) {
-    persist_reset();
-}
-
-void setup_hrm_keys(void) {
-    persist_read();
+uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
+    return TAPPING_TERM + 20;
 }
 
 bool hrm_active(hrm_hand_t hand) {
@@ -19,6 +15,47 @@ bool hrm_active(hrm_hand_t hand) {
         default:             return false;
     }
 }
+
+void init_hrm_eeprom(void) {
+    persist_reset();
+}
+
+bool is_hrm_keycode(uint16_t) {
+    switch (keycode) {
+        case HRM_A:
+        case HRM_R:
+        case HRM_S:
+        case HRM_T:
+
+        case HRM_N:
+        case HRM_E:
+        case HRM_I:
+        case HRM_O:
+            return true;
+    }
+
+    return false;
+}
+
+bool process_hrm(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case HRM_CYCLE:
+            if (record->event.pressed) hrm_mode_cycle();
+            return false;
+
+        case HRM_TOGGLE:
+            if (record->event.pressed) hrm_mode_toggle();
+            return false;
+    }
+
+    return true;
+}
+
+void setup_hrm_keys(void) {
+    persist_read();
+}
+
+// ----------------------------------------------------------------------------
 
 static void hrm_mode_cycle(void) {
     const hrm_mode_t mode = persist_get_hrm_mode();
@@ -34,18 +71,4 @@ static void hrm_mode_toggle(void) {
         persist_set_hrm_last_mode(mode);
         persist_set_hrm_mode(HRM_MODE_OFF);
     }
-}
-
-bool process_hrm(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case HRM_CYCLE:
-            if (record->event.pressed) hrm_mode_cycle();
-            return false;
-
-        case HRM_TOGGLE:
-            if (record->event.pressed) hrm_mode_toggle();
-            return false;
-    }
-
-    return true;
 }

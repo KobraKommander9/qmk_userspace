@@ -3,13 +3,11 @@
 #include "layers.h"
 #include "hrm.h"
 
-#define CUSTOM_TAP(tap_kc)      \
-    SMTD_TAP_16(false, tap_kc); \
-    mouse_mode(false)
+#define IS_CAPS is_caps_word_on() || host_led_state().caps_lock
 
-#define CUSTOM_UNTAP(tap_kc)            \
-    SMTD_UNREGISTER_16(false, tap_kc);  \
-    mouse_mode(false)
+#define CUSTOM_TAP(kc) tap_code16(IS_CAPS ? LSFT(kc) : kc); mouse_mode(false)
+#define CUSTOM_REG(kc) register_code16(IS_CAPS ? LSFT(kc) : kc)
+#define CUSTOM_UNREG(kc) unregister_code16(IS_CAPS ? LSFT(kc) : kc); mouse_mode(false)
 
 #define SHIFT_ACTION(normal_action, shift_action)   \
     if (mods & MOD_MASK_SHIFT) {                    \
@@ -22,38 +20,38 @@
         normal_action;                              \
     }
 
-#define SHIFT_TAP(tap_kc, shift_kc)     \
-    SHIFT_ACTION(                       \
-        SMTD_TAP_16(false, tap_kc);     \
-        register_mods(shift_mod),       \
-        SMTD_TAP_16(false, shift_kc))
+#define SHIFT_TAP(tap_kc, shift_kc) \
+    SHIFT_ACTION(                   \
+        CUSTOM_TAP(tap_kc);         \
+        register_mods(shift_mod),   \
+        CUSTOM_TAP(shift_kc))
 
 #define SHIFT_REGISTER(tap_kc, shift_kc)    \
     SHIFT_ACTION(                           \
-        SMTD_REGISTER_16(false, tap_kc),    \
-        SMTD_REGISTER_16(false, shift_kc);  \
+        CUSTOM_REG(tap_kc),                 \
+        CUSTOM_REG(shift_kc);               \
         shift_registered = true)
 
-#define SHIFT_UNREGISTER(tap_kc, shift_kc)      \
-    if (shift_registered) {                     \
-        shift_registered = false;               \
-        SMTD_UNREGISTER_16(false, shift_kc);    \
-        register_mods(shift_mod);               \
-    } else {                                    \
-        SMTD_UNREGISTER_16(false, tap_kc);      \
+#define SHIFT_UNREGISTER(tap_kc, shift_kc)  \
+    if (shift_registered) {                 \
+        shift_registered = false;           \
+        CUSTOM_UNREG(shift_kc);             \
+        register_mods(shift_mod);           \
+    } else {                                \
+        CUSTOM_UNREG(tap_kc);               \
     }
 
-#define CUSTOM_LT(macro_key, tap_kc, layer)     \
-    SMTD_DANCE(macro_key,                       \
-        NOTHING,                                \
-        CUSTOM_TAP(tap_kc),                     \
-        SMTD_LIMIT(1,                           \
-            mouse_mode(false);                  \
-            LAYER_PUSH(layer),                  \
-            SMTD_REGISTER_16(false, tap_kc)),   \
-        SMTD_LIMIT(1,                           \
-            LAYER_RESTORE(),                    \
-            CUSTOM_UNTAP(tap_kc)))
+#define CUSTOM_LT(macro_key, tap_kc, layer) \
+    SMTD_DANCE(macro_key,                   \
+        NOTHING,                            \
+        CUSTOM_TAP(tap_kc),                 \
+        SMTD_LIMIT(1,                       \
+            mouse_mode(false);              \
+            LAYER_PUSH(layer),              \
+            CUSTOM_REG(tap_kc)),            \
+        SMTD_LIMIT(1,                       \
+            LAYER_RESTORE(),                \
+            CUSTOM_UNREG(tap_kc)))
 
 #define SHIFTED_LT(macro_key, tap_kc, shift_kc, layer)  \
     SMTD_DANCE(macro_key,                               \
@@ -80,14 +78,14 @@
             HRM_ACTIVE(hand,                            \
                 register_mods(MOD_BIT(mod_kc));         \
                 send_keyboard_report(),                 \
-                SMTD_REGISTER_16(false, tap_kc)),       \
-            SMTD_REGISTER_16(false, tap_kc)),           \
+                CUSTOM_REG(tap_kc)),                    \
+            CUSTOM_REG(tap_kc)),                        \
         SMTD_LIMIT(1,                                   \
             HRM_ACTIVE(hand,                            \
                 unregister_mods(MOD_BIT(mod_kc));       \
                 send_keyboard_report(),                 \
-                SMTD_UNREGISTER_16(false, tap_kc)),     \
-            SMTD_UNREGISTER_16(false, tap_kc));         \
+                CUSTOM_UNREG(tap_kc)),                  \
+            CUSTOM_UNREG(tap_kc));                      \
             send_keyboard_report())
 
 smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {

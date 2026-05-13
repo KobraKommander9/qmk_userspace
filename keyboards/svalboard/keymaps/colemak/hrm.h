@@ -15,7 +15,9 @@ typedef enum {
     HRM_HAND_RIGHT,
 } hrm_hand_t;
 
+uint16_t get_hrm_tapping_term(uint16_t, keyrecord_t*);
+bool hrm_active(hrm_hand_t);
 void init_hrm_eeprom(void);
-void setup_hrm_keys(void);
-bool hrm_active(hrm_hand_t hand);
+bool is_hrm_keycode(uint16_t);
 bool process_hrm(uint16_t, keyrecord_t*);
+void setup_hrm_keys(void);

@@ -10,3 +10,11 @@
 #define MOUSE_DPI_2400 6
 // Index into mh_timer_choices[]: {200,300,400,500,800,-1}; -1 = no timeout
 #define MOUSE_LAYER_TIMEOUT_NONE 2
+
+#ifndef CAPS_WORD_ENABLE
+#define CAPS_WORD_ENABLE
+#endif
+
+#undef TAPPING_TERM
+#define TAPPING_TERM 200
+#define TAPPING_TERM_PER_KEY

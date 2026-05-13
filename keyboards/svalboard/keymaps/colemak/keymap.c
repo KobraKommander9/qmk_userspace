@@ -46,6 +46,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*RT*/ KC_LCTL,            KC_BTN1,            KC_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
         /*LT*/ KC_SPC,             MO(_GAME2),         KC_ESC,             SV_SNIPER_5,        SV_SNIPER_3,        TO(_BASE)
         ),
+#undef TAPPING_TERM
+#define TAPPING_TERM 195
 
     [_GAME2] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
@@ -198,4 +200,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     }
 
     return state;
+}
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    if (is_hrm_keycode(keycode)) {
+        return get_hrm_tapping_term(keycode, record);
+    }
+
+    return TAPPING_TERM;
 }
