@@ -202,7 +202,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+bool has_user_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    return is_hrm_keycode(keycode);
+}
+
+uint16_t get_tapping_term_user(uint16_t keycode, keyrecord_t *record) {
     if (is_hrm_keycode(keycode)) {
         return get_hrm_tapping_term(keycode, record);
     }

@@ -3,7 +3,7 @@
 #include "layers.h"
 #include "hrm.h"
 
-#define CAPS_ACTIVE (is_caps_word_on() || host_led_state().caps_lock)
+#define CAPS_ACTIVE (is_caps_word_on() || host_keyboard_led_state().caps_lock)
 #define SHIFT_ACTIVE (!!(get_mods() & MOD_MASK_SHIFT))
 #define SHOULD_CAPS (CAPS_ACTIVE ^ SHIFT_ACTIVE)
 

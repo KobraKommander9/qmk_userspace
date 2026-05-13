@@ -2,6 +2,24 @@
 #include "keys.h"
 #include "persist.h"
 
+static void hrm_mode_cycle(void) {
+    const hrm_mode_t mode = persist_get_hrm_mode();
+    persist_set_hrm_last_mode(mode);
+    persist_set_hrm_mode((mode + 1) % HRM_MODE_COUNT);
+}
+
+static void hrm_mode_toggle(void) {
+    const hrm_mode_t mode = persist_get_hrm_mode();
+    if (mode == HRM_MODE_OFF) {
+        persist_set_hrm_mode(persist_get_hrm_last_mode());
+    } else {
+        persist_set_hrm_last_mode(mode);
+        persist_set_hrm_mode(HRM_MODE_OFF);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
     return TAPPING_TERM + 20;
 }
@@ -20,7 +38,7 @@ void init_hrm_eeprom(void) {
     persist_reset();
 }
 
-bool is_hrm_keycode(uint16_t) {
+bool is_hrm_keycode(uint16_t keycode) {
     switch (keycode) {
         case HRM_A:
         case HRM_R:
@@ -53,22 +71,4 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
 
 void setup_hrm_keys(void) {
     persist_read();
-}
-
-// ----------------------------------------------------------------------------
-
-static void hrm_mode_cycle(void) {
-    const hrm_mode_t mode = persist_get_hrm_mode();
-    persist_set_hrm_last_mode(mode);
-    persist_set_hrm_mode((mode + 1) % HRM_MODE_COUNT);
-}
-
-static void hrm_mode_toggle(void) {
-    const hrm_mode_t mode = persist_get_hrm_mode();
-    if (mode == HRM_MODE_OFF) {
-        persist_set_hrm_mode(persist_get_hrm_last_mode());
-    } else {
-        persist_set_hrm_last_mode(mode);
-        persist_set_hrm_mode(HRM_MODE_OFF);
-    }
 }
