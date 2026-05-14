@@ -33,7 +33,7 @@ enum custom_keycodes {
     HRM_CYCLE,
     HRM_TD, // Tap for Toggle, Double Tap for Cycle
 
-    // Tap Dances
+    // Custom Keys
     CKC_BSPC, // Backspace on tap, delete on Shift+Tap, navigation layer on hold
     CKC_SPC, // Space on tap, numbers layer on hold
     CKC_TAB, // Tab on tap, symbols layer on hold

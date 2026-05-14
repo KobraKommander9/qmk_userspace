@@ -11,6 +11,7 @@
 #include "keys.h"
 #include "hrm.h"
 #include "layers.h"
+#include "tap_dance.h"
 
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
@@ -46,8 +47,6 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*RT*/ KC_LCTL,            KC_BTN1,            KC_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
         /*LT*/ KC_SPC,             MO(_GAME2),         KC_ESC,             SV_SNIPER_5,        SV_SNIPER_3,        TO(_BASE)
         ),
-#undef TAPPING_TERM
-#define TAPPING_TERM 195
 
     [_GAME2] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
@@ -187,6 +186,7 @@ void keyboard_post_init_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
+    if (!process_tap_dance_key(keycode, record)) return false;
 
     return true;
 }
