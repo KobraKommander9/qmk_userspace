@@ -1,5 +1,7 @@
 #pragma once
 
+#include "keys.h"
+
 enum {
     TDE_HRM_A,
     TDE_HRM_R,
@@ -69,17 +71,22 @@ typedef struct {
 typedef struct {
     const td_action_map_t *map;
     uint8_t len;
-} td_dance_config_t;
+} td_config_t;
 
-typedef const td_dance_config_t* (*td_cfg_resolver_t)(void *ctx);
+typedef const td_config_t* (*td_cfg_resolver_t)(const void *ctx);
 
 typedef struct {
-    const td_dance_config_t *cfg;
-    td_action_t active_action;
+    td_action_t action;
+    bool active;
+} td_action_instance_t;
+
+typedef struct {
+    const td_config_t *cfg;
 
     td_cfg_resolver_t resolve;
-    void *resolve_ctx;
-
+    const void *resolve_ctx;
     bool cfg_bound;
+
+    td_action_instance_t active;
     bool committed;
-} tap_dance_runtime_t;
+} td_runtime_t;
