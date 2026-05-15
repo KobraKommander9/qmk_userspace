@@ -1,72 +1,7 @@
 #include "tap_dance.h"
+
 #include "hrm.h"
-
-#include <stdint.h>
-
-typedef enum {
-    TD_NONE,
-    TD_UNKNOWN,
-    TD_SINGLE_TAP,
-    TD_SINGLE_HOLD,
-    TD_DOUBLE_TAP,
-    TD_DOUBLE_HOLD,
-    TD_DOUBLE_SINGLE_TAP,
-    TD_TRIPLE_TAP,
-    TD_TRIPLE_HOLD,
-    TD_TRIPLE_SINGLE_TAP,
-} td_state_t;
-
-typedef enum {
-    TD_ACT_NONE,
-    TD_ACT_KC,
-    TD_ACT_LON,
-    TD_ACT_LOFF,
-    TD_ACT_LTOGG,
-    TD_ACT_FN,
-} td_action_type_t;
-
-typedef void (*td_action_fn_t)(void *ctx);
-
-typedef struct {
-    td_action_type_t type;
-
-    union {
-        uint16_t keycode;
-        uint8_t layer;
-        td_action_fn_t fn;
-    } val;
-
-    void (*reset_fn)(void *ctx);
-    void *ctx;
-} td_action_t;
-
-typedef struct {
-    td_action_t action;
-    td_state_t state;
-} td_action_map_t;
-
-typedef struct {
-    const td_action_map_t *map;
-    uint8_t len;
-} td_dance_config_t;
-
-typedef struct {
-    td_dance_config_t const *cfg;
-    td_action_t active_action;
-} tap_dance_runtime_t;
-
-typedef bool (*tap_dance_enabled_fn_t)(void *ctx);
-
-typedef struct {
-    uint16_t held;
-    uint16_t hold;
-    uint16_t tap;
-
-    tap_dance_enabled_fn_t is_enabled_fn;
-    void *enabled_ctx;
-} tap_dance_tap_hold_t;
-
-// ----------------------------------------------------------------------------
+#include "keys.H"
 
 static bool is_hrm_enabled(void *ctx) {
     hrm_hand_t hand = (hrm_hand_t)(uintptr_t)ctx;
@@ -75,28 +10,72 @@ static bool is_hrm_enabled(void *ctx) {
 
 // ----------------------------------------------------------------------------
 
-#define OVERLOAD4(_1, _2, _3, _4, NAME, ...) NAME
-#define ACTION_TAP_DANCE_TAP_HOLD(...)  \
-    OVERLOAD4(__VA_ARGS__,              \
-        ACTION_TAP_DANCE_TAP_HOLD4,     \
-        INVALID,                        \
-        ACTION_TAP_DANCE_TAP_HOLD2      \
-    )(__VA_ARGS__)
-#define ACTION_TAP_DANCE_TAP_HOLD2(...) \
-    ACTION_TAP_DANCE_TAP_HOLD4(__VA_ARGS__, NULL, NULL)
-#define ACTION_TAP_DANCE_TAP_HOLD4(tap_kc, hold_kc, enabled_fn, ctx)            \
-    {.fn = {NULL, on_tap_dance_tap_hold_finished, on_tap_dance_tap_hold_reset}, \
-        .user_data = (void *)&((tap_dance_tap_hold_t){                          \
-            .tap = (tap_kc),                                                    \
-            .hold = (hold_kc),                                                  \
-            .held = 0,                                                          \
-            .is_enabled_fn = (enabled_fn),                                      \
-            .enabled_ctx = (ctx),                                               \
-        })}
-#define ACTION_TAP_DANCE_HRM(tap, hold, hand) \
-    ACTION_TAP_DANCE_TAP_HOLD(tap, hold, is_hrm_enabled, (void *)(uintptr_t)(hand))
+// #define OVERLOAD4(_1, _2, _3, _4, NAME, ...) NAME
+// #define ACTION_TAP_DANCE_TAP_HOLD(...)  \
+//     OVERLOAD4(__VA_ARGS__,              \
+//         ACTION_TAP_DANCE_TAP_HOLD4,     \
+//         INVALID,                        \
+//         ACTION_TAP_DANCE_TAP_HOLD2      \
+//     )(__VA_ARGS__)
+// #define ACTION_TAP_DANCE_TAP_HOLD2(...) \
+//     ACTION_TAP_DANCE_TAP_HOLD4(__VA_ARGS__, NULL, NULL)
+// #define ACTION_TAP_DANCE_TAP_HOLD4(tap_kc, hold_kc, enabled_fn, ctx)            \
+//     {.fn = {NULL, on_tap_dance_tap_hold_finished, on_tap_dance_tap_hold_reset}, \
+//         .user_data = (void *)&((tap_dance_tap_hold_t){                          \
+//             .tap = (tap_kc),                                                    \
+//             .hold = (hold_kc),                                                  \
+//             .held = 0,                                                          \
+//             .is_enabled_fn = (enabled_fn),                                      \
+//             .enabled_ctx = (ctx),                                               \
+//         })}
+// #define ACTION_TAP_DANCE_HRM(tap, hold, hand) \
+//     ACTION_TAP_DANCE_TAP_HOLD(tap, hold, is_hrm_enabled, (void *)(uintptr_t)(hand))
 
 // ----------------------------------------------------------------------------
+
+static td_depth_t compute_depth(const td_dance_config_t *cfg) {
+    td_depth_t depth = TD_DEPTH_SINGLE;
+
+    for (uint8_t i = 0; i < cfg->len; ++i) {
+        td_state_t state = cfg->map[i].state;
+        switch (state) {
+            case TD_DOUBLE_TAP:
+            case TD_DOUBLE_HOLD:
+            case TD_DOUBLE_SINGLE_TAP:
+                if (depth < TD_DEPTH_DOUBLE)
+                    depth = TD_DEPTH_DOUBLE;
+                break;
+
+            case TD_TRIPLE_TAP:
+            case TD_TRIPLE_HOLD:
+            case TD_TRIPLE_SINGLE_TAP:
+                return TD_DEPTH_TRIPLE;
+        }
+    }
+
+    return depth;
+}
+
+static bool can_commit_early(td_state_t state, const td_dance_config_t *cfg) {
+    switch (state) {
+        case TD_SINGLE_TAP:
+        case TD_SINGLE_HOLD:
+            return cfg->max_depth == TD_DEPTH_SINGLE;
+
+        case TD_DOUBLE_TAP:
+        case TD_DOUBLE_HOLD:
+        case TD_DOUBLE_SINGLE_TAP:
+            return cfg->max_depth <= TD_DEPTH_DOUBLE;
+
+        case TD_TRIPLE_TAP:
+        case TD_TRIPLE_HOLD:
+        case TD_TRIPLE_SINGLE_TAP:
+            return true;
+
+        default:
+            return false;
+    }
+}
 
 static inline td_action_t td_action_none(void) {
     return (td_action_t){ .type = TD_ACT_NONE };
@@ -163,13 +142,21 @@ static td_state_t dance_step(tap_dance_state_t *state) {
     return TD_UNKNOWN;
 }
 
+static void on_dance(tap_dance_state_t *state, void *user_data) {
+    td_dance_runtime_t *runtime = user_data;
+    td_state_t td_state = dance_step(state);
+
+    if (can_commit_early(td_state, runtime->cfg)) {
+        td_action_t action = lookup_action(runtime, td_state);
+        execute_action(runtime, action);
+    }
+}
+
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     const td_dance_runtime_t *runtime = user_data;
 
     td_state_t td_state = dance_step(state);
     td_action_t action = lookup_action(runtime, td_state);
-
-    if (action.type == TD_ACT_NONE) return;
 
     execute_action(runtime, action);
 }
@@ -195,31 +182,31 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     runtime->active_action.type = TD_ACT_NONE;
 }
 
-static void on_tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
-    if (!state->pressed) return;
-
-    tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
-
-    bool enabled = tap_hold->is_enabled_fn == NULL ||
-        tap_hold->is_enabled_fn(tap_hold->enabled_ctx);
-
-    if (enabled && state->count == 1) {
-        register_code16(tap_hold->hold);
-        tap_hold->held = tap_hold->hold;
-    } else {
-        register_code16(tap_hold->tap);
-        tap_hold->held = tap_hold->tap;
-    }
-}
-
-static void on_tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
-    tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
-
-    if (tap_hold->held) {
-        unregister_code16(tap_hold->held);
-        tap_hold->held = 0;
-    }
-}
+// static void on_tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
+//     if (!state->pressed) return;
+//
+//     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
+//
+//     bool enabled = tap_hold->is_enabled_fn == NULL ||
+//         tap_hold->is_enabled_fn(tap_hold->enabled_ctx);
+//
+//     if (enabled && state->count == 1) {
+//         register_code16(tap_hold->hold);
+//         tap_hold->held = tap_hold->hold;
+//     } else {
+//         register_code16(tap_hold->tap);
+//         tap_hold->held = tap_hold->tap;
+//     }
+// }
+//
+// static void on_tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
+//     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
+//
+//     if (tap_hold->held) {
+//         unregister_code16(tap_hold->held);
+//         tap_hold->held = 0;
+//     }
+// }
 
 // ----------------------------------------------------------------------------
 
@@ -235,21 +222,21 @@ tap_dance_action_t user_tap_dance_actions[] = {
     [TDE_HRM_O] = ACTION_TAP_DANCE_HRM(KC_O, KC_RGUI, HRM_HAND_RIGHT),
 };
 
-bool process_tap_dance_key(uint16_t keycode, keyrecord_t *record) {
-    if (!is_user_td(keycode)) return true;
-    if (record->event.pressed) return true;
-
-    tap_dance_action_t *action;
-
-    uint16_t idx = user_td_idx(keycode);
-    switch (idx) {
-        case TDE_HRM_A:
-            action = tap_dance_get_user(idx);
-            if (action->state.count && !action->state.finished) {
-                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
-                tap_code16(tap_hold->tap);
-            }
-    }
-
-    return true;
-}
+// bool process_tap_dance_key(uint16_t keycode, keyrecord_t *record) {
+//     if (!is_user_td(keycode)) return true;
+//     if (record->event.pressed) return true;
+//
+//     tap_dance_action_t *action;
+//
+//     uint16_t idx = user_td_idx(keycode);
+//     switch (idx) {
+//         case TDE_HRM_A:
+//             action = tap_dance_get_user(idx);
+//             if (action->state.count && !action->state.finished) {
+//                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+//                 tap_code16(tap_hold->tap);
+//             }
+//     }
+//
+//     return true;
+// }

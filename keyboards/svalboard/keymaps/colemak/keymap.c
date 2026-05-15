@@ -11,7 +11,6 @@
 #include "keys.h"
 #include "hrm.h"
 #include "layers.h"
-#include "tap_dance.h"
 
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
@@ -186,7 +185,6 @@ void keyboard_post_init_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
-    if (!process_tap_dance_key(keycode, record)) return false;
 
     return true;
 }
