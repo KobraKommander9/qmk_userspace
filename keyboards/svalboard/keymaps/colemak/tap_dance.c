@@ -10,6 +10,21 @@ static bool is_hrm_enabled(void *ctx) {
 
 // ----------------------------------------------------------------------------
 
+#define ACTION_TD_TAP_HOLD(tap, hold)           \
+    (td_dance_config_t){                        \
+        .map = (td_action_map_t[]){             \
+            { TD_SINGLE_TAP, (td_action_t){     \
+                .type = TD_ACT_KC,              \
+                .val.keycode = (tap),           \
+            }},                                 \
+            { TD_SINGLE_HOLD, (td_action_t){    \
+                .type = TD_ACT_KC,              \
+                .val.keycode = (hold),          \
+            }},                                 \
+        },                                      \
+        .len = 2,                               \
+    }
+
 // #define OVERLOAD4(_1, _2, _3, _4, NAME, ...) NAME
 // #define ACTION_TAP_DANCE_TAP_HOLD(...)  \
 //     OVERLOAD4(__VA_ARGS__,              \
