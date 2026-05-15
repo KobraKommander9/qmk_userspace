@@ -1,6 +1,6 @@
 #pragma once
 
-#include "keys.h"
+#include "keymap_support.h"
 
 enum {
     TDE_HRM_A,
