@@ -3,50 +3,85 @@
 #include "hrm.h"
 #include "keys.H"
 
-static bool is_hrm_enabled(void *ctx) {
-    hrm_hand_t hand = (hrm_hand_t)(uintptr_t)ctx;
-    return hrm_active(hand);
-}
+#define OVERLOAD3(_1, _2, _3, NAME, ...) NAME
 
-// ----------------------------------------------------------------------------
+#define TD_KC(kc)               \
+    ((td_action_t){             \
+        .type = TD_ACT_KC,      \
+        .val.keycode = (kc),    \
+    })
 
-#define ACTION_TD_TAP_HOLD(tap, hold)           \
-    (td_dance_config_t){                        \
-        .map = (td_action_map_t[]){             \
-            { TD_SINGLE_TAP, (td_action_t){     \
-                .type = TD_ACT_KC,              \
-                .val.keycode = (tap),           \
-            }},                                 \
-            { TD_SINGLE_HOLD, (td_action_t){    \
-                .type = TD_ACT_KC,              \
-                .val.keycode = (hold),          \
-            }},                                 \
-        },                                      \
-        .len = 2,                               \
+#define TD_LON(layer)           \
+    ((td_action_t){             \
+        .type = TD_ACT_LON,     \
+        .val.layer = (layer),   \
+    })
+
+#define TD_LOFF(layer)          \
+    ((td_action_t){             \
+        .type = TD_ACT_LOFF,    \
+        .val.layer = (layer),   \
+    })
+
+#define TD_LTOGG(layer)         \
+    ((td_action_t){             \
+        .type = TD_ACT_LTOGG,   \
+        .val.layer = (layer),   \
+    })
+
+#define TD_FN(...) OVERLOAD3(__VA_ARGS__, TD_FN3, TD_FN2, TD_FN1)(__VA_ARGS__)
+#define TD_FN1(fn) TD_FN3(fn, NULL, NULL)
+#define TD_FN2(fn, ctxptr) TD_FN3(fn, ctxptr, NULL)
+#define TD_FN3(fn, ctxptr, reset)   \
+    ((td_action_t){                 \
+        .type = TD_ACT_FN,          \
+        .val.fn = (fn),             \
+        .reset_fn = (reset),        \
+        .ctx = (ctxptr),            \
+    })
+
+#define TD_MAP(s, a) \
+    { .state = (s), .action = (a) }
+
+#define TD_CFG(name, ...)                           \
+    static const td_action_map_t name##_map[] = {   \
+        __VA_ARGS__                                 \
+    };                                              \
+    static const td_dance_config_t name##_cfg = {   \
+        .map = name##_map,                          \
+        .len = ARRAY_SIZE(name##_map),              \
     }
 
-// #define OVERLOAD4(_1, _2, _3, _4, NAME, ...) NAME
-// #define ACTION_TAP_DANCE_TAP_HOLD(...)  \
-//     OVERLOAD4(__VA_ARGS__,              \
-//         ACTION_TAP_DANCE_TAP_HOLD4,     \
-//         INVALID,                        \
-//         ACTION_TAP_DANCE_TAP_HOLD2      \
-//     )(__VA_ARGS__)
-// #define ACTION_TAP_DANCE_TAP_HOLD2(...) \
-//     ACTION_TAP_DANCE_TAP_HOLD4(__VA_ARGS__, NULL, NULL)
-// #define ACTION_TAP_DANCE_TAP_HOLD4(tap_kc, hold_kc, enabled_fn, ctx)            \
-//     {.fn = {NULL, on_tap_dance_tap_hold_finished, on_tap_dance_tap_hold_reset}, \
-//         .user_data = (void *)&((tap_dance_tap_hold_t){                          \
-//             .tap = (tap_kc),                                                    \
-//             .hold = (hold_kc),                                                  \
-//             .held = 0,                                                          \
-//             .is_enabled_fn = (enabled_fn),                                      \
-//             .enabled_ctx = (ctx),                                               \
-//         })}
-// #define ACTION_TAP_DANCE_HRM(tap, hold, hand) \
-//     ACTION_TAP_DANCE_TAP_HOLD(tap, hold, is_hrm_enabled, (void *)(uintptr_t)(hand))
+#define TD_RUNTIME(name, cfgname)               \
+    static tap_dance_runtime_t name##_rt = {    \
+        .cfg = &cfgname##_cfg,                  \
+        .resolve = NULL,                        \
+        .resolve_ctx = NULL,                    \
+        .cfg_bound = true,                      \
+        .committed = false,                     \
+    }
+#define TD_RUNTIME_RESOLVED(name, resolver, ctxptr) \
+    static tap_dance_runtime_t name##_rt = {        \
+        .cfg = NULL,                                \
+        .resolve = (resolver),                      \
+        .resolve_ctx = (ctxptr),                    \
+        .cfg_bound = false,                         \
+        .committed = false,                         \
+    }
+
+#define TD_ACTION(name)                                     \
+    {.fn = {on_dance, on_dance_finished, on_dance_reset },  \
+        .user_data = (void *)&name##_rt }
 
 // ----------------------------------------------------------------------------
+
+static inline void td_bind_cfg(tap_dance_runtime_t *runtime) {
+    if (runtime->cfg_bound || runtime->resolve == NULL)
+        return;
+
+    runtime->cfg = runtime->resolve(runtime->resolve_ctx);
+    runtime->cfg_bound = (runtime->cfg != NULL);
+}
 
 static td_depth_t compute_depth(const td_dance_config_t *cfg) {
     td_depth_t depth = TD_DEPTH_SINGLE;
@@ -75,15 +110,13 @@ static bool can_commit_early(td_state_t state, const td_dance_config_t *cfg) {
     switch (state) {
         case TD_SINGLE_TAP:
         case TD_SINGLE_HOLD:
-            return cfg->max_depth == TD_DEPTH_SINGLE;
+            return compute_depth(cfg) == TD_DEPTH_SINGLE;
 
         case TD_DOUBLE_TAP:
-        case TD_DOUBLE_HOLD:
         case TD_DOUBLE_SINGLE_TAP:
-            return cfg->max_depth <= TD_DEPTH_DOUBLE;
+            return compute_depth(cfg) <= TD_DEPTH_DOUBLE;
 
         case TD_TRIPLE_TAP:
-        case TD_TRIPLE_HOLD:
         case TD_TRIPLE_SINGLE_TAP:
             return true;
 
@@ -97,6 +130,9 @@ static inline td_action_t td_action_none(void) {
 }
 
 static td_action_t lookup_action(const td_dance_runtime_t *runtime, td_state_t state) {
+    if (!runtime->cfg)
+        return td_action_none();
+
     const td_dance_config_t *cfg = runtime->cfg;
 
     for (uint8_t i = 0; i < cfg->len; ++i) {
@@ -109,7 +145,11 @@ static td_action_t lookup_action(const td_dance_runtime_t *runtime, td_state_t s
 }
 
 static void execute_action(td_dance_runtime_t *runtime, td_action_t action) {
+    if (runtime->committed || action.type == TD_ACT_NONE)
+        return;
+
     runtime->active_action = action;
+    runtime->committed = true;
 
     switch (action.type) {
         case TD_ACT_KC:
@@ -129,9 +169,7 @@ static void execute_action(td_dance_runtime_t *runtime, td_action_t action) {
             break;
 
         case TD_ACT_FN:
-            if (action.val.fn) {
-                action.val.fn(action.ctx);
-            }
+            if (action.val.fn) action.val.fn(action.ctx);
             break;
     }
 }
@@ -159,8 +197,12 @@ static td_state_t dance_step(tap_dance_state_t *state) {
 
 static void on_dance(tap_dance_state_t *state, void *user_data) {
     td_dance_runtime_t *runtime = user_data;
-    td_state_t td_state = dance_step(state);
+    td_bind_cfg(runtime);
 
+    if (!runtime->cfg)
+        return;
+
+    td_state_t td_state = dance_step(state);
     if (can_commit_early(td_state, runtime->cfg)) {
         td_action_t action = lookup_action(runtime, td_state);
         execute_action(runtime, action);
@@ -168,7 +210,11 @@ static void on_dance(tap_dance_state_t *state, void *user_data) {
 }
 
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
-    const td_dance_runtime_t *runtime = user_data;
+    td_dance_runtime_t *runtime = user_data;
+    td_bind_cfg(runtime);
+
+    if (!runtime->cfg)
+        return;
 
     td_state_t td_state = dance_step(state);
     td_action_t action = lookup_action(runtime, td_state);
@@ -195,63 +241,66 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     }
 
     runtime->active_action.type = TD_ACT_NONE;
+    runtime->committed = false;
+
+    if (runtime->resolve && !runtime->committed) {
+        runtime->cfg_bound = false;
+        runtime->cfg = NULL;
+    }
 }
 
-// static void on_tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
-//     if (!state->pressed) return;
-//
-//     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
-//
-//     bool enabled = tap_hold->is_enabled_fn == NULL ||
-//         tap_hold->is_enabled_fn(tap_hold->enabled_ctx);
-//
-//     if (enabled && state->count == 1) {
-//         register_code16(tap_hold->hold);
-//         tap_hold->held = tap_hold->hold;
-//     } else {
-//         register_code16(tap_hold->tap);
-//         tap_hold->held = tap_hold->tap;
-//     }
-// }
-//
-// static void on_tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
-//     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
-//
-//     if (tap_hold->held) {
-//         unregister_code16(tap_hold->held);
-//         tap_hold->held = 0;
-//     }
-// }
+// ----------------------------------------------------------------------------
+// HRM
+
+typedef struct {
+    hrm_hand_t hand;
+
+    const td_dance_config_t *enabled;
+    const td_dance_config_t *disabled;
+} hrm_td_ctx_t;
+
+static const td_dance_config_t *hrm_resolver(void *ctx) {
+    const hrm_td_ctx_t *hrm = ctx;
+    return hrm_active(hrm->hand)
+        ? hrm->enabled
+        : hrm->disabled;
+}
+
+#define TD_HRM(name, kc, mod, hrm_hand)                 \
+    TD_CFG(name##_enabled,                              \
+        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),               \
+        TD_MAP(TD_SINGLE_HOLD, TD_KC(mod))              \
+    );                                                  \
+    TD_CFG(name##_disabled,                             \
+        TD_MAP(TD_SINGLE_TAP, TD_KC(kc))                \
+    );                                                  \
+    static const hrm_td_ctx_t name##_ctx = {            \
+        .hand = (hrm_hand),                             \
+        .enabled = &name##_enabled_cfg,                 \
+        .disabled = &name##_disabled_cfg,               \
+    };                                                  \
+    TD_RUNTIME_RESOLVED(name, hrm_resolver, &name##_ctx)
+
+TD_HRM(hrm_a, KC_A, KC_LGUI, HRM_HAND_LEFT);
+TD_HRM(hrm_r, KC_R, KC_LALT, HRM_HAND_LEFT);
+TD_HRM(hrm_s, KC_S, KC_LSFT, HRM_HAND_LEFT);
+TD_HRM(hrm_t, KC_T, KC_LCTL, HRM_HAND_LEFT);
+
+TD_HRM(hrm_n, KC_N, KC_RCTL, HRM_HAND_RIGHT);
+TD_HRM(hrm_e, KC_E, KC_RSFT, HRM_HAND_RIGHT);
+TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT);
+TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
 // ----------------------------------------------------------------------------
 
 tap_dance_action_t user_tap_dance_actions[] = {
-    [TDE_HRM_A] = ACTION_TAP_DANCE_HRM(KC_A, KC_LGUI, HRM_HAND_LEFT),
-    [TDE_HRM_R] = ACTION_TAP_DANCE_HRM(KC_R, KC_LALT, HRM_HAND_LEFT),
-    [TDE_HRM_S] = ACTION_TAP_DANCE_HRM(KC_S, KC_LSFT, HRM_HAND_LEFT),
-    [TDE_HRM_T] = ACTION_TAP_DANCE_HRM(KC_T, KC_LCTL, HRM_HAND_LEFT),
+    [TDE_HRM_A] = TD_ACTION(hrm_a),
+    [TDE_HRM_R] = TD_ACTION(hrm_r),
+    [TDE_HRM_S] = TD_ACTION(hrm_s),
+    [TDE_HRM_T] = TD_ACTION(hrm_t),
 
-    [TDE_HRM_N] = ACTION_TAP_DANCE_HRM(KC_N, KC_RCTL, HRM_HAND_RIGHT),
-    [TDE_HRM_E] = ACTION_TAP_DANCE_HRM(KC_E, KC_RSFT, HRM_HAND_RIGHT),
-    [TDE_HRM_I] = ACTION_TAP_DANCE_HRM(KC_I, KC_LALT, HRM_HAND_RIGHT),
-    [TDE_HRM_O] = ACTION_TAP_DANCE_HRM(KC_O, KC_RGUI, HRM_HAND_RIGHT),
+    [TDE_HRM_N] = TD_ACTION(hrm_n),
+    [TDE_HRM_E] = TD_ACTION(hrm_e),
+    [TDE_HRM_I] = TD_ACTION(hrm_i),
+    [TDE_HRM_O] = TD_ACTION(hrm_o),
 };
-
-// bool process_tap_dance_key(uint16_t keycode, keyrecord_t *record) {
-//     if (!is_user_td(keycode)) return true;
-//     if (record->event.pressed) return true;
-//
-//     tap_dance_action_t *action;
-//
-//     uint16_t idx = user_td_idx(keycode);
-//     switch (idx) {
-//         case TDE_HRM_A:
-//             action = tap_dance_get_user(idx);
-//             if (action->state.count && !action->state.finished) {
-//                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
-//                 tap_code16(tap_hold->tap);
-//             }
-//     }
-//
-//     return true;
-// }

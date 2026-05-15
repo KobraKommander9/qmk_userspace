@@ -69,11 +69,17 @@ typedef struct {
 typedef struct {
     const td_action_map_t *map;
     uint8_t len;
-
-    td_depth_t max_depth;
 } td_dance_config_t;
 
+typedef const td_dance_config_t* (*td_cfg_resolver_t)(void *ctx);
+
 typedef struct {
-    td_dance_config_t const *cfg;
+    const td_dance_config_t *cfg;
     td_action_t active_action;
+
+    td_cfg_resolver_t resolve;
+    void *resolve_ctx;
+
+    bool cfg_bound;
+    bool committed;
 } tap_dance_runtime_t;
