@@ -11,7 +11,6 @@ SRC += keymap_support.c
 SRC += persist.c
 SRC += hrm.c
 SRC += layers.c
-SRC += smtd.c
 SRC += tap_dance.c
 
 # DO NOT ENABLE LTO — Svalboard will fail to compile with it

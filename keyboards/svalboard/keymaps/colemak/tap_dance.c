@@ -1,7 +1,7 @@
 #include "tap_dance.h"
 
 #include "hrm.h"
-#include "keys.H"
+#include "keys.h"
 
 #define OVERLOAD3(_1, _2, _3, NAME, ...) NAME
 
