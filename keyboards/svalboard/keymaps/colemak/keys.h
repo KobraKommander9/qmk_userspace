@@ -17,37 +17,28 @@
 #define SV_RDPD SV_RIGHT_DPI_DEC
 #define SV_SOUT SV_OUTPUT_STATUS
 
-#define TD_HRM_A USER_TD(TDE_HRM_A)
-#define TD_HRM_R USER_TD(TDE_HRM_R)
-#define TD_HRM_S USER_TD(TDE_HRM_S)
-#define TD_HRM_T USER_TD(TDE_HRM_T)
+#define HRM_A USER_TD(TDE_HRM_A)
+#define HRM_R USER_TD(TDE_HRM_R)
+#define HRM_S USER_TD(TDE_HRM_S)
+#define HRM_T USER_TD(TDE_HRM_T)
 
-#define TD_HRM_N USER_TD(TDE_HRM_N)
-#define TD_HRM_E USER_TD(TDE_HRM_E)
-#define TD_HRM_I USER_TD(TDE_HRM_I)
-#define TD_HRM_O USER_TD(TDE_HRM_O)
+#define HRM_N USER_TD(TDE_HRM_N)
+#define HRM_E USER_TD(TDE_HRM_E)
+#define HRM_I USER_TD(TDE_HRM_I)
+#define HRM_O USER_TD(TDE_HRM_O)
+
+#define CKC_SPC USER_TD(TDE_CK_SPC)
+#define CKC_TAB USER_TD(TDE_CK_TAB)
 
 #define RANGE_START QK_KB_20
 enum custom_keycodes {
     // Home Row Mods
-    HRM_A = RANGE_START,
-    HRM_R,
-    HRM_S,
-    HRM_T,
-
-    HRM_N,
-    HRM_E,
-    HRM_I,
-    HRM_O,
-
-    HRM_TOGGLE,
+    HRM_TOGGLE = RANGE_START,
     HRM_CYCLE,
     HRM_TD, // Tap for Toggle, Double Tap for Cycle
 
     // Custom Keys
     CKC_BSPC, // Backspace on tap, delete on Shift+Tap, navigation layer on hold
-    CKC_SPC, // Space on tap, numbers layer on hold
-    CKC_TAB, // Tab on tap, symbols layer on hold
 };
 
 extern void mouse_mode(bool on);

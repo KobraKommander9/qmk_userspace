@@ -1,9 +1,37 @@
 #include "tap_dance.h"
 
 #include "hrm.h"
+#include "layers.h"
 #include "keys.h"
 
 #define OVERLOAD3(_1, _2, _3, NAME, ...) NAME
+
+#define CAPS_ACTIVE (is_caps_word_on() || host_keyboard_led_state().caps_lock)
+#define SHIFT_ACTIVE (!!(get_mods() & MOD_MASK_SHIFT))
+#define SHOULD_CAPS (CAPS_ACTIVE ^ SHIFT_ACTIVE)
+
+#define ALPHA_REG(kc) register_code16(SHOULD_CAPS ? LSFT(kc) : kc)
+#define ALPHA_UNREG(kc) unregister_code16(SHOULD_CAPS ? LSFT(kc) : kc); mouse_mode(false)
+
+#define RETURN_LAYER_NOT_SET 13
+static uint8_t return_layer = RETURN_LAYER_NOT_SET;
+static uint8_t return_layer_cnt = 0;
+
+#define LAYER_PUSH(layer)                               \
+    mouse_mode(false);                                  \
+    return_layer_cnt++;                                 \
+    if (return_layer_cnt == RETURN_LAYER_NOT_SET) {     \
+        return_layer = get_highest_layer(layer_state);  \
+    }                                                   \
+    layer_move(layer)
+#define LAYER_RESTORE()                             \
+    if (return_layer_cnt > 0) {                     \
+        return_layer_cnt--;                         \
+        if (return_layer_cnt == 0) {                \
+            layer_move(return_layer);               \
+            return_layer = RETURN_LAYER_NOT_SET;    \
+        }                                           \
+    }
 
 #define TD_KC(kc)               \
     ((td_action_t){             \
@@ -11,22 +39,10 @@
         .val.keycode = (kc),    \
     })
 
-#define TD_LON(layer)           \
-    ((td_action_t){             \
-        .type = TD_ACT_LON,     \
-        .val.layer = (layer),   \
-    })
-
-#define TD_LOFF(layer)          \
-    ((td_action_t){             \
-        .type = TD_ACT_LOFF,    \
-        .val.layer = (layer),   \
-    })
-
-#define TD_LTOGG(layer)         \
-    ((td_action_t){             \
-        .type = TD_ACT_LTOGG,   \
-        .val.layer = (layer),   \
+#define TD_LMV(l)           \
+    ((td_action_t){         \
+        .type = TD_ACT_LMV, \
+        .val.layer = (l),   \
     })
 
 #define TD_FN(...) OVERLOAD3(__VA_ARGS__, TD_FN3, TD_FN2, TD_FN1)(__VA_ARGS__)
@@ -157,19 +173,11 @@ static void execute_action(td_runtime_t *runtime, td_action_t action) {
 
     switch (action.type) {
         case TD_ACT_KC:
-            register_code16(action.val.keycode);
+            ALPHA_REG(action.val.keycode);
             break;
 
-        case TD_ACT_LON:
-            layer_on(action.val.layer);
-            break;
-
-        case TD_ACT_LOFF:
-            layer_off(action.val.layer);
-            break;
-
-        case TD_ACT_LTOGG:
-            layer_invert(action.val.layer);
+        case TD_ACT_LMV:
+            LAYER_PUSH(action.val.layer);
             break;
 
         case TD_ACT_FN:
@@ -240,7 +248,11 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
 
         switch (action->type) {
             case TD_ACT_KC:
-                unregister_code16(action->val.keycode);
+                ALPHA_UNREG(action->val.keycode);
+                break;
+
+            case TD_ACT_LMV:
+                LAYER_RESTORE();
                 break;
 
             default:
@@ -303,6 +315,19 @@ TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT);
 TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
 // ----------------------------------------------------------------------------
+// Layers
+
+#define TD_LAYER(name, kc, layer)               \
+    TD_CFG(name,                                \
+        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),       \
+        TD_MAP(TD_SINGLE_HOLD, TD_LMV(layer))   \
+    );                                          \
+    TD_RUNTIME(name, name)
+
+TD_LAYER(ckc_spc, KC_SPC, _NUM);
+TD_LAYER(ckc_tab, KC_TAB, _SYM);
+
+// ----------------------------------------------------------------------------
 
 USER_TAP_DANCE_TABLE(
     [TDE_HRM_A] = TD_ACTION(hrm_a),
@@ -314,4 +339,7 @@ USER_TAP_DANCE_TABLE(
     [TDE_HRM_E] = TD_ACTION(hrm_e),
     [TDE_HRM_I] = TD_ACTION(hrm_i),
     [TDE_HRM_O] = TD_ACTION(hrm_o),
+
+    [TDE_CK_SPC] = TD_ACTION(ckc_spc),
+    [TDE_CK_TAB] = TD_ACTION(ckc_tab),
 );

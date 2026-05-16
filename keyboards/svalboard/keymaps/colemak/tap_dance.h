@@ -42,9 +42,7 @@ typedef enum {
 typedef enum {
     TD_ACT_NONE,
     TD_ACT_KC,
-    TD_ACT_LON,
-    TD_ACT_LOFF,
-    TD_ACT_LTOGG,
+    TD_ACT_LMV,
     TD_ACT_FN,
 } td_action_type_t;
 
