@@ -205,8 +205,6 @@ static td_state_t dance_step(tap_dance_state_t *state) {
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
 
-    dprintf("tap dance finished")
-
     td_bind_cfg(runtime);
     if (!runtime->cfg)
         return;
@@ -219,8 +217,6 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
 
 static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
-
-    dprintf("tap dance released")
 
     td_bind_cfg(runtime);
     if (!runtime->cfg || runtime->committed)
@@ -238,8 +234,6 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
     (void)state;
-
-    dprintf("tap dance reset")
 
     if (runtime->active.active) {
         td_action_t *action = &runtime->active.action;
@@ -310,7 +304,7 @@ TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
 // ----------------------------------------------------------------------------
 
-tap_dance_action_t user_tap_dance_actions[] = {
+USER_TAP_DANCE_TABLE(
     [TDE_HRM_A] = TD_ACTION(hrm_a),
     [TDE_HRM_R] = TD_ACTION(hrm_r),
     [TDE_HRM_S] = TD_ACTION(hrm_s),
@@ -320,4 +314,4 @@ tap_dance_action_t user_tap_dance_actions[] = {
     [TDE_HRM_E] = TD_ACTION(hrm_e),
     [TDE_HRM_I] = TD_ACTION(hrm_i),
     [TDE_HRM_O] = TD_ACTION(hrm_o),
-};
+);
