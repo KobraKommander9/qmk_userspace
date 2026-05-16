@@ -205,6 +205,8 @@ static td_state_t dance_step(tap_dance_state_t *state) {
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
 
+    dprintf("tap dance finished")
+
     td_bind_cfg(runtime);
     if (!runtime->cfg)
         return;
@@ -217,6 +219,8 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
 
 static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
+
+    dprintf("tap dance released")
 
     td_bind_cfg(runtime);
     if (!runtime->cfg || runtime->committed)
@@ -234,6 +238,8 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
     (void)state;
+
+    dprintf("tap dance reset")
 
     if (runtime->active.active) {
         td_action_t *action = &runtime->active.action;

@@ -179,6 +179,9 @@ void keyboard_post_init_user(void) {
     global_saved_values.right_dpi_index = MOUSE_DPI_1200;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
+    debug_enable = true;
+    dprintf("tap dance count: %d (%d VIAL)", tap_dance_count(), VIAL_TAP_DANCE_ENTRIES);
+
     setup_hrm_keys();
     setup_rgb_colors();
 }
