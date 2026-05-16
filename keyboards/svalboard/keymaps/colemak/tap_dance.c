@@ -69,8 +69,8 @@
         .committed = false,                         \
     }
 
-#define TD_ACTION(name)                                     \
-    {.fn = {on_dance, on_dance_finished, on_dance_reset },  \
+#define TD_ACTION(name)                                                         \
+    {.fn = {NULL, on_dance_finished, on_dance_reset, on_dance_release },        \
         .user_data = (void *)&name##_rt }
 
 // ----------------------------------------------------------------------------
@@ -202,20 +202,6 @@ static td_state_t dance_step(tap_dance_state_t *state) {
     return TD_UNKNOWN;
 }
 
-static void on_dance(tap_dance_state_t *state, void *user_data) {
-    td_runtime_t *runtime = user_data;
-
-    td_bind_cfg(runtime);
-    if (!runtime->cfg)
-        return;
-
-    td_state_t td_state = dance_step(state);
-    if (can_commit_early(td_state, runtime->cfg)) {
-        td_action_t action = lookup_action(runtime, td_state);
-        execute_action(runtime, action);
-    }
-}
-
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
 
@@ -227,6 +213,22 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_action_t action = lookup_action(runtime, td_state);
 
     execute_action(runtime, action);
+}
+
+static void on_dance_release(tap_dance_state_t *state, void *user_data) {
+    td_runtime_t *runtime = user_data;
+
+    td_bind_cfg(runtime);
+    if (!runtime->cfg || runtime->committed)
+        return;
+
+    td_state_t td_state = dance_step(state);
+    if (can_commit_early(td_state, runtime->cfg)) {
+        td_action_t action = lookup_action(runtime, td_state);
+        execute_action(runtime, action);
+        if (runtime->committed)
+            state->finished = true;
+    }
 }
 
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
