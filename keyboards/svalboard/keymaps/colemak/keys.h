@@ -27,6 +27,7 @@
 #define HRM_I USER_TD(TDE_HRM_I)
 #define HRM_O USER_TD(TDE_HRM_O)
 
+#define CKC_BSPC USER_TD(TDE_CK_BSPC)
 #define CKC_SPC USER_TD(TDE_CK_SPC)
 #define CKC_TAB USER_TD(TDE_CK_TAB)
 
@@ -36,9 +37,6 @@ enum custom_keycodes {
     HRM_TOGGLE = RANGE_START,
     HRM_CYCLE,
     HRM_TD, // Tap for Toggle, Double Tap for Cycle
-
-    // Custom Keys
-    CKC_BSPC, // Backspace on tap, delete on Shift+Tap, navigation layer on hold
 };
 
 extern void mouse_mode(bool on);

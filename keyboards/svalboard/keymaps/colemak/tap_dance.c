@@ -6,13 +6,6 @@
 
 #define OVERLOAD3(_1, _2, _3, NAME, ...) NAME
 
-#define CAPS_ACTIVE (is_caps_word_on() || host_keyboard_led_state().caps_lock)
-#define SHIFT_ACTIVE (!!(get_mods() & MOD_MASK_SHIFT))
-#define SHOULD_CAPS (CAPS_ACTIVE ^ SHIFT_ACTIVE)
-
-#define ALPHA_REG(kc) register_code16(SHOULD_CAPS ? LSFT(kc) : kc)
-#define ALPHA_UNREG(kc) unregister_code16(SHOULD_CAPS ? LSFT(kc) : kc); mouse_mode(false)
-
 #define RETURN_LAYER_NOT_SET 13
 static uint8_t return_layer = RETURN_LAYER_NOT_SET;
 static uint8_t return_layer_cnt = 0;
@@ -36,6 +29,18 @@ static uint8_t return_layer_cnt = 0;
 #define TD_KC(kc)               \
     ((td_action_t){             \
         .type = TD_ACT_KC,      \
+        .val.keycode = (kc),    \
+    })
+
+#define TD_KC_SFT(base, shifted)                \
+    ((td_action_t){                             \
+        .type = TD_ACT_KC_SFT,                  \
+        .val.kc_pair = { (base), (shifted) },   \
+    })
+
+#define TD_MOD(kc)              \
+    ((td_action_t){             \
+        .type = TD_ACT_MOD,     \
         .val.keycode = (kc),    \
     })
 
@@ -88,6 +93,34 @@ static uint8_t return_layer_cnt = 0;
 #define TD_ACTION(name)                                                         \
     {.fn = {NULL, on_dance_finished, on_dance_reset, on_dance_release },        \
         .user_data = (void *)&name##_rt }
+
+// ----------------------------------------------------------------------------
+// Shift
+
+static inline td_shift_mode_t td_get_shift_mode(void) {
+    bool phys = (get_mods() & MOD_MASK_SHIFT);
+    bool caps = is_caps_word_on() || host_keyboard_led_state().caps_lock;
+
+    if (phys && caps) return TD_SHIFT_BOTH;
+    if (phys)         return TD_SHIFT_PHYSICAL;
+    if (caps)         return TD_SHIFT_LOGICAL;
+    return TD_SHIFT_NONE;
+}
+
+static inline uint16_t td_apply_shift(uint16_t kc, td_shift_mode_t mode) {
+    switch (mode) {
+        case TD_SHIFT_PHYSICAL:
+        case TD_SHIFT_LOGICAL:
+        case TD_SHIFT_BOTH:
+            return LSFT(kc);
+
+        default:
+            return kc;
+    }
+}
+
+#define TD_SEND(kc) register_code16(td_apply_shift(kc, td_get_shift_mode()))
+#define TD_UNSEND(kc) unregister_code16(td_apply_shift(kc, td_get_shift_mode()))
 
 // ----------------------------------------------------------------------------
 
@@ -173,7 +206,20 @@ static void execute_action(td_runtime_t *runtime, td_action_t action) {
 
     switch (action.type) {
         case TD_ACT_KC:
-            ALPHA_REG(action.val.keycode);
+            TD_SEND(action.val.keycode);
+            break;
+
+        case TD_ACT_KC_SFT: {
+            uint16_t kc = (td_get_shift_mode() != TD_SHIFT_NONE)
+                ? action.val.kc_pair.shifted
+                : action.val.kc_pair.base;
+
+            TD_SEND(kc);
+            break;
+        }
+
+        case TD_ACT_MOD:
+            register_mods(MOD_BIT(action.val.keycode));
             break;
 
         case TD_ACT_LMV:
@@ -248,7 +294,12 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
 
         switch (action->type) {
             case TD_ACT_KC:
-                ALPHA_UNREG(action->val.keycode);
+                TD_UNSEND(action->val.keycode);
+                mouse_mode(false);
+                break;
+
+            case TD_ACT_MOD:
+                unregister_mods(MOD_BIT(action->val.keycode));
                 break;
 
             case TD_ACT_LMV:
@@ -261,7 +312,6 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
                 break;
         }
     }
-
 
     runtime->active.active = false;
     runtime->committed = false;
@@ -292,7 +342,7 @@ static const td_config_t *hrm_resolver(const void *ctx) {
 #define TD_HRM(name, kc, mod, hrm_hand)                 \
     TD_CFG(name##_enabled,                              \
         TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),               \
-        TD_MAP(TD_SINGLE_HOLD, TD_KC(mod))              \
+        TD_MAP(TD_SINGLE_HOLD, TD_MOD(mod))             \
     );                                                  \
     TD_CFG(name##_disabled,                             \
         TD_MAP(TD_SINGLE_TAP, TD_KC(kc))                \
@@ -304,6 +354,8 @@ static const td_config_t *hrm_resolver(const void *ctx) {
     };                                                  \
     TD_RUNTIME_RESOLVED(name, hrm_resolver, &name##_ctx)
 
+// ----------------------------------------------------------------------------
+
 TD_HRM(hrm_a, KC_A, KC_LGUI, HRM_HAND_LEFT);
 TD_HRM(hrm_r, KC_R, KC_LALT, HRM_HAND_LEFT);
 TD_HRM(hrm_s, KC_S, KC_LSFT, HRM_HAND_LEFT);
@@ -314,20 +366,23 @@ TD_HRM(hrm_e, KC_E, KC_RSFT, HRM_HAND_RIGHT);
 TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT);
 TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
-// ----------------------------------------------------------------------------
-// Layers
+TD_CFG(ckc_spc,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_SPC)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NUM))
+);
+TD_RUNTIME(ckc_spc, ckc_spc);
 
-#define TD_LAYER(name, kc, layer)               \
-    TD_CFG(name,                                \
-        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),       \
-        TD_MAP(TD_SINGLE_HOLD, TD_LMV(layer))   \
-    );                                          \
-    TD_RUNTIME(name, name)
+TD_CFG(ckc_tab,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_TAB)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_SYM))
+);
+TD_RUNTIME(ckc_tab, ckc_tab);
 
-TD_LAYER(ckc_spc, KC_SPC, _NUM);
-TD_LAYER(ckc_tab, KC_TAB, _SYM);
-
-// ----------------------------------------------------------------------------
+TD_CFG(ckc_bspc,
+    TD_MAP(TD_SINGLE_TAP, TD_KC_SFT(KC_BSPC, KC_DEL)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NAV))
+);
+TD_RUNTIME(ckc_bspc, ckc_bspc);
 
 USER_TAP_DANCE_TABLE(
     [TDE_HRM_A] = TD_ACTION(hrm_a),
@@ -340,6 +395,7 @@ USER_TAP_DANCE_TABLE(
     [TDE_HRM_I] = TD_ACTION(hrm_i),
     [TDE_HRM_O] = TD_ACTION(hrm_o),
 
+    [TDE_CK_BSPC] = TD_ACTION(ckc_bspc),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),
 );

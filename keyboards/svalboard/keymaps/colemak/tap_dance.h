@@ -42,9 +42,18 @@ typedef enum {
 typedef enum {
     TD_ACT_NONE,
     TD_ACT_KC,
+    TD_ACT_KC_SFT,
+    TD_ACT_MOD,
     TD_ACT_LMV,
     TD_ACT_FN,
 } td_action_type_t;
+
+typedef enum {
+    TD_SHIFT_NONE,
+    TD_SHIFT_PHYSICAL,
+    TD_SHIFT_LOGICAL,
+    TD_SHIFT_BOTH,
+} td_shift_mode_t;
 
 typedef void (*td_action_fn_t)(void *ctx);
 
@@ -54,7 +63,13 @@ typedef struct {
     union {
         uint16_t keycode;
         uint8_t layer;
-        td_action_fn_t fn;
+
+        struct {
+            uint16_t base;
+            uint16_t shifted;
+        } kc_pair;
+
+        void (*fn)(void *ctx);
     } val;
 
     void (*reset_fn)(void *ctx);
