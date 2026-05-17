@@ -88,10 +88,11 @@ typedef struct {
 
 typedef const td_config_t* (*td_cfg_resolver_t)(const void *ctx);
 
-typedef struct {
-    td_action_t action;
-    bool active;
-} td_action_instance_t;
+typedef enum {
+    TD_IDLE = 0,
+    TD_ACTIVE,
+    TD_RECOVER,
+} td_runtime_state_t;
 
 typedef struct {
     const td_config_t *cfg;
@@ -100,6 +101,8 @@ typedef struct {
     const void *resolve_ctx;
     bool cfg_bound;
 
-    td_action_instance_t active;
-    bool committed;
+    td_runtime_state_t state;
+    td_action_t action;
+    uint32_t last_event_time;
+    uint8_t depth;
 } td_runtime_t;

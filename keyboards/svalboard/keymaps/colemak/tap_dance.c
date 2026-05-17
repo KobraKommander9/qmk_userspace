@@ -132,6 +132,11 @@ static inline void td_bind_cfg(td_runtime_t *runtime) {
     runtime->cfg_bound = (runtime->cfg != NULL);
 }
 
+static inline void td_set_state(td_runtime_t *runtime, td_runtime_state_t state) {
+    runtime->state = state;
+    runtime->last_event_time = timer_read32();
+}
+
 static td_depth_t compute_depth(const td_config_t *cfg) {
     td_depth_t depth = TD_DEPTH_SINGLE;
 
@@ -177,64 +182,6 @@ static bool can_commit_early(td_state_t state, const td_config_t *cfg) {
     }
 }
 
-static inline td_action_t td_action_none(void) {
-    return (td_action_t){ .type = TD_ACT_NONE };
-}
-
-static td_action_t lookup_action(const td_runtime_t *runtime, td_state_t state) {
-    if (!runtime->cfg)
-        return td_action_none();
-
-    const td_config_t *cfg = runtime->cfg;
-
-    for (uint8_t i = 0; i < cfg->len; ++i) {
-        if (cfg->map[i].state == state) {
-            return cfg->map[i].action;
-        }
-    }
-
-    return td_action_none();
-}
-
-static void execute_action(td_runtime_t *runtime, td_action_t action) {
-    if (runtime->committed || action.type == TD_ACT_NONE)
-        return;
-
-    runtime->active.action = action;
-    runtime->active.active = true;
-    runtime->committed = true;
-
-    switch (action.type) {
-        case TD_ACT_KC:
-            TD_SEND(action.val.keycode);
-            break;
-
-        case TD_ACT_KC_SFT: {
-            uint16_t kc = (td_get_shift_mode() != TD_SHIFT_NONE)
-                ? action.val.kc_pair.shifted
-                : action.val.kc_pair.base;
-
-            TD_SEND(kc);
-            break;
-        }
-
-        case TD_ACT_MOD:
-            register_mods(MOD_BIT(action.val.keycode));
-            break;
-
-        case TD_ACT_LMV:
-            LAYER_PUSH(action.val.layer);
-            break;
-
-        case TD_ACT_FN:
-            if (action.val.fn) action.val.fn(action.ctx);
-            break;
-
-        default:
-            break;
-    }
-}
-
 static td_state_t dance_step(tap_dance_state_t *state) {
     if (state->count == 1) {
         if (state->interrupted || !state->pressed) return TD_SINGLE_TAP;
@@ -256,6 +203,94 @@ static td_state_t dance_step(tap_dance_state_t *state) {
     return TD_UNKNOWN;
 }
 
+static inline td_action_t td_action_none(void) {
+    return (td_action_t){ .type = TD_ACT_NONE };
+}
+
+static td_action_t lookup_action(const td_runtime_t *runtime, td_state_t state) {
+    if (!runtime->cfg)
+        return td_action_none();
+
+    const td_config_t *cfg = runtime->cfg;
+
+    for (uint8_t i = 0; i < cfg->len; ++i) {
+        if (cfg->map[i].state == state) {
+            return cfg->map[i].action;
+        }
+    }
+
+    return td_action_none();
+}
+
+static void execute_action(td_runtime_t *runtime, td_action_t action) {
+    if (action.type == TD_ACT_NONE)
+        return;
+
+    runtime->action = action;
+    switch (action.type) {
+        case TD_ACT_KC:
+            TD_SEND(action.val.keycode);
+            td_set_state(runtime, TD_ACTIVE);
+            break;
+
+        case TD_ACT_KC_SFT: {
+            uint16_t kc = (td_get_shift_mode() != TD_SHIFT_NONE)
+                ? action.val.kc_pair.shifted
+                : action.val.kc_pair.base;
+
+            TD_SEND(kc);
+            td_set_state(runtime, TD_ACTIVE);
+            break;
+        }
+
+        case TD_ACT_MOD:
+            register_mods(MOD_BIT(action.val.keycode));
+            td_set_state(runtime, TD_ACTIVE);
+            break;
+
+        case TD_ACT_LMV:
+            LAYER_PUSH(action.val.layer);
+            td_set_state(runtime, TD_ACTIVE);
+            break;
+
+        case TD_ACT_FN:
+            if (action.val.fn) {
+                action.val.fn(action.ctx);
+                td_set_state(runtime, TD_ACTIVE);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+static void td_cleanup(td_runtime_t *runtime) {
+    switch(runtime->action.type) {
+        case TD_ACT_KC:
+            TD_UNSEND(r->action.val.keycode);
+            mouse_mode(false);
+            break;
+
+        case TD_ACT_MOD:
+            unregister_mods(MOD_BIT(r->action.val.keycode));
+            break;
+
+        case TD_ACT_LMV:
+            LAYER_RESTORE();
+            break;
+
+        default:
+            break;
+    }
+
+    if (runtime->action.reset_fn)
+        runtime->action.reset_fn(runtime->action.ctx);
+
+    runtime->action = td_action_none();
+    td_set_state(runtime, TD_IDLE);
+}
+
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
 
@@ -273,15 +308,12 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
 
     td_bind_cfg(runtime);
-    if (!runtime->cfg || runtime->committed)
+    if (!runtime->cfg)
         return;
 
     td_state_t td_state = dance_step(state);
     if (can_commit_early(td_state, runtime->cfg)) {
-        td_action_t action = lookup_action(runtime, td_state);
-        execute_action(runtime, action);
-        if (runtime->committed)
-            state->finished = true;
+        execute_action(runtime, lookup_action(runtime, td_state));
     }
 }
 
@@ -289,37 +321,7 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *runtime = user_data;
     (void)state;
 
-    if (runtime->active.active) {
-        td_action_t *action = &runtime->active.action;
-
-        switch (action->type) {
-            case TD_ACT_KC:
-                TD_UNSEND(action->val.keycode);
-                mouse_mode(false);
-                break;
-
-            case TD_ACT_MOD:
-                unregister_mods(MOD_BIT(action->val.keycode));
-                break;
-
-            case TD_ACT_LMV:
-                LAYER_RESTORE();
-                break;
-
-            default:
-                if (action->reset_fn)
-                    action->reset_fn(action->ctx);
-                break;
-        }
-    }
-
-    runtime->active.active = false;
-    runtime->committed = false;
-
-    if (runtime->resolve) {
-        runtime->cfg_bound = false;
-        runtime->cfg = NULL;
-    }
+    td_cleanup(runtime);
 }
 
 // ----------------------------------------------------------------------------
