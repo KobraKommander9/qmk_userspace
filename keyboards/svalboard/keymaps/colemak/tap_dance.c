@@ -246,13 +246,32 @@ static td_state_t td_dance_step(tap_dance_state_t *s) {
     return TD_UNKNOWN;
 }
 
+static td_state_t td_get_fallback(td_state_t state) {
+    switch (state) {
+        case TD_SINGLE_HOLD: return TD_SINGLE_TAP;
+        case TD_DOUBLE_TAP: return TD_SINGLE_TAP;
+        case TD_DOUBLE_HOLD: return TD_DOUBLE_TAP;
+        case TD_DOUBLE_SINGLE_TAP: return TD_DOUBLE_TAP;
+        case TD_TRIPLE_TAP: return TD_DOUBLE_TAP;
+        case TD_TRIPLE_HOLD: return TD_TRIPLE_TAP;
+        case TD_TRIPLE_SINGLE_TAP: return TD_TRIPLE_TAP;
+        default: return TD_UNKNOWN;
+    }
+}
+
 static td_action_t td_lookup_action(const td_runtime_t *rt, td_state_t state) {
     if (!rt->cfg)
         return td_action_none();
 
-    for (uint8_t i = 0; i < rt->cfg->len; i++) {
-        if (rt->cfg->map[i].state == state)
-            return rt->cfg->map[i].action;
+    const td_config_t *cfg = rt->cfg;
+    td_state_t candidate = state;
+
+    while (candidate != TD_UNKNOWN) {
+        for (uint8_t i = 0; i < cfg->len; i++) {
+            if (cfg->map[i].state == candidate)
+                return cfg->map[i].action;
+        }
+        candidate = td_get_fallback(candidate);
     }
 
     return td_action_none();
