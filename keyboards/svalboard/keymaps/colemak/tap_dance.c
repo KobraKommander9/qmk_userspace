@@ -83,10 +83,14 @@ typedef struct {
     td_action_instance_t active;
 } td_runtime_t;
 
-typedef enum {
-    TD_EXEC_FINISHED,
-    TD_EXEC_RELEASE,
-} td_exec_origin_t;
+typedef struct {
+    uint16_t kc;
+    bool active;
+} td_press_t;
+
+typedef struct {
+    bool hold;
+} td_commit_t;
 
 // ----------------------------------------------------------------------------
 // Action constructors
@@ -191,18 +195,21 @@ static uint8_t return_layer_cnt = 0;
 // ----------------------------------------------------------------------------
 // Shift Handling
 
-static inline bool td_phys_shift(void) {
-    return (get_mods() & MOD_MASK_SHIFT);
-}
+typedef struct {
+    bool phys;
+    bool caps;
+    bool effective;
+} td_shift_t;
 
-static inline bool td_logical_shift(void) {
-    return (is_caps_word_on() || host_keyboard_led_state().caps_lock);
-}
+static inline td_shift_t td_get_shift(void) {
+    bool phys = (get_mods() & MOD_MASK_SHIFT);
+    bool caps  = is_caps_word_on() || host_keyboard_led_state().caps_lock;
 
-static inline bool td_effective_shift(void) {
-    bool caps = td_logical_shift();
-    bool phys = td_phys_shift();
-    return caps ^ phys;
+    return (td_shift_t){
+        .phys = phys,
+        .caps = caps,
+        .effective = phys ^ caps,
+    };
 }
 
 // ----------------------------------------------------------------------------
@@ -217,54 +224,6 @@ static void td_bind_cfg(td_runtime_t *rt) {
         return;
 
     rt->cfg = rt->resolve(rt->resolve_ctx);
-}
-
-static td_depth_t td_compute_depth(const td_config_t *cfg) {
-    td_depth_t depth = TD_DEPTH_SINGLE;
-
-    for (uint8_t i = 0; i < cfg->len; i++) {
-        switch (cfg->map[i].state) {
-            case TD_DOUBLE_TAP:
-            case TD_DOUBLE_HOLD:
-            case TD_DOUBLE_SINGLE_TAP:
-                if (depth < TD_DEPTH_DOUBLE)
-                    depth = TD_DEPTH_DOUBLE;
-                break;
-
-            case TD_TRIPLE_TAP:
-            case TD_TRIPLE_HOLD:
-            case TD_TRIPLE_SINGLE_TAP:
-                return TD_DEPTH_TRIPLE;
-
-            default:
-                break;
-        }
-    }
-
-    return depth;
-}
-
-static bool td_can_emit_on_release(
-    td_state_t state,
-    const td_config_t *cfg
-) {
-    td_depth_t depth = td_compute_depth(cfg);
-
-    switch (state) {
-        case TD_SINGLE_TAP:
-            return depth == TD_DEPTH_SINGLE;
-
-        case TD_DOUBLE_TAP:
-        case TD_DOUBLE_SINGLE_TAP:
-            return depth <= TD_DEPTH_DOUBLE;
-
-        case TD_TRIPLE_TAP:
-        case TD_TRIPLE_SINGLE_TAP:
-            return true;
-
-        default:
-            return false;
-    }
 }
 
 static td_state_t td_dance_step(tap_dance_state_t *s) {
@@ -302,53 +261,59 @@ static td_action_t td_lookup_action(const td_runtime_t *rt, td_state_t state) {
 // ----------------------------------------------------------------------------
 // Execute/Cleanup
 
-static void td_execute(
-    td_runtime_t *rt,
-    td_action_t action,
-    td_exec_origin_t origin
-) {
-    if (rt->active.active || action.type == TD_ACT_NONE)
-        return;
+static uint16_t td_resolve_keycode(td_action_t *action, td_shift_t sh) {
+    switch (action->type) {
+        case TD_ACT_KC:
+            return sh.effective
+                ? LSFT(action->val.keycode)
+                : action->val.keycode;
 
-    if (origin == TD_EXEC_RELEASE) {
-        switch (action.type) {
-            case TD_ACT_KC:
-            case TD_ACT_KC_SFT:
-                break;
+        case TD_ACT_KC_SFT:
+            if (sh.phys)
+                return action->val.kc_pair.shifted;
 
-            default:
-                return;
-        }
+            return sh.caps
+                ? LSFT(action->val.kc_pair.base)
+                : action->val.kc_pair.base;
+
+        default:
+            return 0;
     }
+}
+
+static void td_emit(td_runtime_t *rt, td_action_t action, bool hold)
+{
+    td_shift_t sh = td_get_shift();
 
     rt->active.action = action;
     rt->active.active = true;
 
     switch (action.type) {
         case TD_ACT_KC:
-            rt->active.emitted_kc = td_effective_shift()
-                ? LSFT(action.val.keycode)
-                : action.val.keycode;
-
-            register_code16(rt->active.emitted_kc);
-            break;
-
         case TD_ACT_KC_SFT: {
-            bool caps = td_logical_shift();
-            bool phys = td_phys_shift();
+            uint16_t kc = td_resolve_keycode(&action, sh);
+            if (!kc) return;
 
-            rt->active.emitted_kc = phys
-                ? action.val.kc_pair.shifted
-                : (phys ^ caps
-                    ? LSFT(action.val.kc_pair.base)
-                    : action.val.kc_pair.base);
+            rt->active.emitted_kc = kc;
 
-            register_code16(rt->active.emitted_kc);
+            if (hold) {
+                register_code16(kc);
+            } else {
+                tap_code16(kc);
+                mouse_mode(false);
+            }
+
             break;
         }
 
         case TD_ACT_MOD:
-            register_mods(MOD_BIT(action.val.keycode));
+            if (hold) {
+                register_mods(MOD_BIT(action.val.keycode));
+            } else {
+                tap_code16(MOD_BIT(action.val.keycode));
+                mouse_mode(false);
+            }
+
             break;
 
         case TD_ACT_LMV:
@@ -365,7 +330,7 @@ static void td_execute(
     }
 }
 
-static void td_cleanup(td_runtime_t *rt) {
+static void td_release(td_runtime_t *rt) {
     if (!rt->active.active)
         return;
 
@@ -379,6 +344,7 @@ static void td_cleanup(td_runtime_t *rt) {
 
         case TD_ACT_MOD:
             unregister_mods(MOD_BIT(action->val.keycode));
+            mouse_mode(false);
             break;
 
         case TD_ACT_LMV:
@@ -389,11 +355,8 @@ static void td_cleanup(td_runtime_t *rt) {
             break;
     }
 
-    if (action->reset_fn)
-        action->reset_fn(action->ctx);
-
-    rt->active.action = td_action_none();
     rt->active.active = false;
+    rt->active.action = td_action_none();
 
     if (rt->resolve)
         rt->cfg = NULL;
@@ -410,14 +373,15 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
         return;
 
     td_state_t td_state = td_dance_step(state);
-    if (!td_can_emit_on_release(td_state, rt->cfg))
-        return;
+    if (td_state == TD_SINGLE_TAP ||
+        td_state == TD_DOUBLE_TAP ||
+        td_state == TD_TRIPLE_TAP ||
+        td_state == TD_DOUBLE_SINGLE_TAP ||
+        td_state == TD_TRIPLE_SINGLE_TAP) {
 
-    td_action_t action = td_lookup_action(rt, td_state);
-    td_execute(rt, action, TD_EXEC_RELEASE);
-
-    if (rt->active.active)
-        state->finished = true;
+        td_action_t action = td_lookup_action(rt, td_state);
+        td_emit(rt, action, false);
+    }
 }
 
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
@@ -430,16 +394,20 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
         return;
 
     td_state_t td_state = td_dance_step(state);
-    td_action_t action = td_lookup_action(rt, td_state);
+    if (td_state == TD_SINGLE_HOLD ||
+        td_state == TD_DOUBLE_HOLD ||
+        td_state == TD_TRIPLE_HOLD) {
 
-    td_execute(rt, action, TD_EXEC_FINISHED);
+        td_action_t action = td_lookup_action(rt, td_state);
+        td_emit(rt, action, true);
+    }
 }
 
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
     (void)state;
 
     td_runtime_t *rt = user_data;
-    td_cleanup(rt);
+    td_release(rt);
 }
 
 // ----------------------------------------------------------------------------
