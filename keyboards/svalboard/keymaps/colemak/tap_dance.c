@@ -20,6 +20,8 @@ typedef enum {
     TD_TRIPLE_TAP,
     TD_TRIPLE_HOLD,
     TD_TRIPLE_SINGLE_TAP,
+
+    TD_MORE_TAPS,
 } td_state_t;
 
 typedef enum {
@@ -64,7 +66,7 @@ typedef struct {
 typedef struct {
     const td_action_map_t *map;
     uint8_t len;
-    uint16_t hold_term;
+    uint16_t retro_term;  // > 0: enables hold-on-interrupt + retro-tap when held >= retro_term ms
 } td_config_t;
 
 typedef const td_config_t *(*td_resolver_t)(const void *);
@@ -82,6 +84,7 @@ typedef struct {
     const void *resolve_ctx;
 
     td_action_instance_t active;
+    bool pending_tap;
     uint16_t press_time;
 } td_runtime_t;
 
@@ -146,14 +149,14 @@ typedef struct {
         .len = ARRAY_SIZE(name##_map),              \
     }
 
-#define TD_CFG_TERM(name, term_, ...)               \
+#define TD_CFG_IH(name, retro_term_, ...)           \
     static const td_action_map_t name##_map[] = {   \
         __VA_ARGS__                                 \
     };                                              \
     static const td_config_t name##_cfg = {         \
         .map = name##_map,                          \
         .len = ARRAY_SIZE(name##_map),              \
-        .hold_term = (term_),                       \
+        .retro_term = (retro_term_),                \
     }
 
 #define TD_RUNTIME(name, cfgname)       \
@@ -272,7 +275,7 @@ static td_state_t td_dance_step(tap_dance_state_t *s) {
         return s->pressed ? TD_TRIPLE_HOLD : TD_TRIPLE_TAP;
     }
 
-    return TD_UNKNOWN;
+    return TD_MORE_TAPS;
 }
 
 static td_state_t td_get_fallback(td_state_t state) {
@@ -284,6 +287,7 @@ static td_state_t td_get_fallback(td_state_t state) {
         case TD_TRIPLE_TAP: return TD_DOUBLE_TAP;
         case TD_TRIPLE_HOLD: return TD_TRIPLE_TAP;
         case TD_TRIPLE_SINGLE_TAP: return TD_TRIPLE_TAP;
+        case TD_MORE_TAPS: return TD_TRIPLE_TAP;
         default: return TD_UNKNOWN;
     }
 }
@@ -420,12 +424,18 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     if (!rt->cfg)
         return;
 
+    if (rt->cfg->retro_term > 0 && timer_elapsed(rt->press_time) >= rt->cfg->retro_term) {
+        rt->pending_tap = true;
+        return;
+    }
+
     td_state_t td_state = td_dance_step(state);
     if (td_state == TD_SINGLE_TAP ||
         td_state == TD_DOUBLE_TAP ||
         td_state == TD_TRIPLE_TAP ||
         td_state == TD_DOUBLE_SINGLE_TAP ||
-        td_state == TD_TRIPLE_SINGLE_TAP) {
+        td_state == TD_TRIPLE_SINGLE_TAP ||
+        td_state == TD_MORE_TAPS) {
 
         td_action_t action = td_lookup_action(rt, td_state);
         td_emit(rt, action, false);
@@ -442,17 +452,50 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
 
     td_state_t td_state = td_dance_step(state);
 
-    // Timing-aware interrupt: if key was held past hold_term before interrupt, treat as hold
-    if (state->interrupted && state->pressed && rt->cfg->hold_term > 0 &&
-        timer_elapsed(rt->press_time) >= rt->cfg->hold_term) {
-        if      (td_state == TD_SINGLE_TAP)       td_state = TD_SINGLE_HOLD;
+    // Pending tap: deferred from on_dance_release for interrupt_hold configs
+    if (rt->pending_tap) {
+        if (!state->interrupted) {
+            // Timer fired, no interrupt: pure tap, emit now
+            td_action_t action = td_lookup_action(rt, td_state);
+            td_emit(rt, action, false);
+
+            rt->active.active = false;
+            rt->pending_tap = false;
+
+            return;
+        }
+
+        if (!state->pressed) {
+            // Retro: key released before interrupt. One-shot mod for TD_ACT_MOD.
+            td_action_t hold = td_lookup_action(rt, TD_SINGLE_HOLD);
+
+            if (hold.type == TD_ACT_MOD) {
+                set_oneshot_mods(MOD_BIT(hold.val.keycode));
+            } else {
+                td_action_t tap = td_lookup_action(rt, td_state);
+                td_emit(rt, tap, false);
+                rt->active.active = false;
+            }
+
+            rt->pending_tap = false;
+            return;
+        }
+
+        // Interrupted while still pressed: clear, fall through to hold path
+        rt->pending_tap = false;
+    }
+
+    // Hold-on-interrupt: if held while another key pressed, fire hold immediately
+    if (state->interrupted && state->pressed && rt->cfg->retro_term > 0) {
+        if      (td_state == TD_SINGLE_TAP)        td_state = TD_SINGLE_HOLD;
         else if (td_state == TD_DOUBLE_SINGLE_TAP) td_state = TD_DOUBLE_HOLD;
         else if (td_state == TD_TRIPLE_SINGLE_TAP) td_state = TD_TRIPLE_HOLD;
     }
 
     if (td_state != TD_SINGLE_HOLD &&
         td_state != TD_DOUBLE_HOLD &&
-        td_state != TD_TRIPLE_HOLD)
+        td_state != TD_TRIPLE_HOLD &&
+        td_state != TD_MORE_TAPS)
         return;
 
     // Hold can override an intermediate tap already emitted by on_each_release
@@ -465,9 +508,20 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
 }
 
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
-    (void)state;
-
     td_runtime_t *rt = user_data;
+
+    if (rt->pending_tap) {
+        td_bind_cfg(rt);
+        if (rt->cfg) {
+            td_action_t action = td_lookup_action(rt, td_dance_step(state));
+            td_emit(rt, action, false);
+
+            rt->active.active = false;
+        }
+
+        rt->pending_tap = false;
+    }
+
     td_release(rt);
 }
 
@@ -488,33 +542,33 @@ static const td_config_t *hrm_resolver(const void *ctx) {
         : hrm->disabled;
 }
 
-#define TD_HRM(name, kc, mod, hand_, term_)             \
-    TD_CFG_TERM(name##_enabled, (term_),                \
-        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),               \
-        TD_MAP(TD_SINGLE_HOLD, TD_MOD(mod))             \
-    );                                                  \
-    TD_CFG(name##_disabled,                             \
-        TD_MAP(TD_SINGLE_TAP, TD_KC(kc))                \
-    );                                                  \
-    static const hrm_td_ctx_t name##_ctx = {            \
-        .hand = (hand_),                                \
-        .enabled = &name##_enabled_cfg,                 \
-        .disabled = &name##_disabled_cfg,               \
-    };                                                  \
+#define TD_HRM(name, kc, mod, hand_, retro_term_)           \
+    TD_CFG_IH(name##_enabled, (retro_term_),                \
+        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),                   \
+        TD_MAP(TD_SINGLE_HOLD, TD_MOD(mod))                 \
+    );                                                      \
+    TD_CFG(name##_disabled,                                 \
+        TD_MAP(TD_SINGLE_TAP, TD_KC(kc))                    \
+    );                                                      \
+    static const hrm_td_ctx_t name##_ctx = {                \
+        .hand = (hand_),                                    \
+        .enabled = &name##_enabled_cfg,                     \
+        .disabled = &name##_disabled_cfg,                   \
+    };                                                      \
     TD_RUNTIME_RESOLVED(name, hrm_resolver, &name##_ctx)
 
 // ----------------------------------------------------------------------------
 // Definitions
 
-TD_HRM(hrm_a, KC_A, KC_LGUI, HRM_HAND_LEFT,  TAPPING_TERM);
-TD_HRM(hrm_r, KC_R, KC_LALT, HRM_HAND_LEFT,  TAPPING_TERM - 20);
-TD_HRM(hrm_s, KC_S, KC_LSFT, HRM_HAND_LEFT,  TAPPING_TERM - 75);
-TD_HRM(hrm_t, KC_T, KC_LCTL, HRM_HAND_LEFT,  TAPPING_TERM);
+TD_HRM(hrm_a, KC_A, KC_LGUI, HRM_HAND_LEFT,  TAPPING_TERM - 20);
+TD_HRM(hrm_r, KC_R, KC_LALT, HRM_HAND_LEFT,  TAPPING_TERM - 20 - 20);
+TD_HRM(hrm_s, KC_S, KC_LSFT, HRM_HAND_LEFT,  TAPPING_TERM - 75 - 20);
+TD_HRM(hrm_t, KC_T, KC_LCTL, HRM_HAND_LEFT,  TAPPING_TERM - 20);
 
-TD_HRM(hrm_n, KC_N, KC_RCTL, HRM_HAND_RIGHT, TAPPING_TERM);
-TD_HRM(hrm_e, KC_E, KC_RSFT, HRM_HAND_RIGHT, TAPPING_TERM - 75);
-TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT, TAPPING_TERM - 20);
-TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT, TAPPING_TERM);
+TD_HRM(hrm_n, KC_N, KC_RCTL, HRM_HAND_RIGHT, TAPPING_TERM - 20);
+TD_HRM(hrm_e, KC_E, KC_RSFT, HRM_HAND_RIGHT, TAPPING_TERM - 75 - 20);
+TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT, TAPPING_TERM - 20 - 20);
+TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT, TAPPING_TERM - 20);
 
 TD_CFG(ckc_spc,
     TD_MAP(TD_SINGLE_TAP, TD_KC(KC_SPC)),
@@ -530,8 +584,7 @@ TD_RUNTIME(ckc_tab, ckc_tab);
 
 TD_CFG(ckc_bspc,
     TD_MAP(TD_SINGLE_TAP,  TD_KC_SFT(KC_BSPC, KC_DEL)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NAV)),
-    TD_MAP(TD_DOUBLE_HOLD, TD_KC_SFT(KC_BSPC, KC_DEL))
+    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NAV))
 );
 TD_RUNTIME(ckc_bspc, ckc_bspc);
 
