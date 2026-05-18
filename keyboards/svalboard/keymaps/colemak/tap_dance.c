@@ -212,6 +212,23 @@ static inline td_shift_t td_get_shift(void) {
     };
 }
 
+static void break_caps_word(uint16_t kc) {
+    if (!is_caps_word_on()) return;
+
+    switch (kc) {
+        case KC_A ... KC_Z:
+        case KC_1 ... KC_0:
+        case KC_MINS:
+        case KC_BSPC:
+        case KC_DEL:
+        case KC_UNDS:
+            break;
+
+        default:
+            caps_word_off();
+    }
+}
+
 // ----------------------------------------------------------------------------
 // Runtime helpers
 
@@ -280,51 +297,42 @@ static td_action_t td_lookup_action(const td_runtime_t *rt, td_state_t state) {
 // ----------------------------------------------------------------------------
 // Execute/Cleanup
 
-static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
-    td_shift_t sh = td_get_shift();
+static void td_emit_kc16(td_runtime_t *rt, uint16_t kc, bool hold, bool suppress) {
+    rt->active.emitted_kc = kc;
+    if (hold) {
+        register_code16(kc);
+    } else {
+        if (suppress) { del_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
+        tap_code16(kc);
+        if (suppress) { add_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
+        mouse_mode(false);
+    }
+}
 
+static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
     rt->active.action = action;
     rt->active.active = true;
 
     switch (action.type) {
         case TD_ACT_KC: {
-            rt->active.emitted_kc = sh.effective
-                ? LSFT(action.val.keycode)
-                : action.val.keycode;
-
-            if (hold) {
-                register_code16(rt->active.emitted_kc);
-            } else {
-                bool suppress = sh.phys && !sh.effective;
-                if (suppress) { del_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
-                tap_code16(rt->active.emitted_kc);
-                if (suppress) { add_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
-                mouse_mode(false);
-            }
-
+            td_shift_t sh = td_get_shift();
+            break_caps_word(action.val.keycode);
+            uint16_t kc = sh.effective ? LSFT(action.val.keycode) : action.val.keycode;
+            td_emit_kc16(rt, kc, hold, sh.phys && sh.caps);
             break;
         }
 
         case TD_ACT_KC_SFT: {
-            rt->active.emitted_kc = sh.phys
-                ? action.val.kc_pair.shifted
-                : sh.caps
-                    ? LSFT(action.val.kc_pair.base)
-                    : action.val.kc_pair.base;
-
-            if (hold) {
-                register_code16(rt->active.emitted_kc);
-            } else {
-                if (sh.phys) { del_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
-                tap_code16(rt->active.emitted_kc);
-                if (sh.phys) { add_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
-                mouse_mode(false);
-            }
-
+            td_shift_t sh = td_get_shift();
+            uint16_t kc = sh.phys ? action.val.kc_pair.shifted : action.val.kc_pair.base;
+            break_caps_word(kc);
+            td_emit_kc16(rt, sh.caps && !sh.phys ? LSFT(kc) : kc, hold, sh.phys);
             break;
         }
 
         case TD_ACT_MOD:
+            break_caps_word(action.val.keycode);
+
             if (hold) {
                 register_mods(MOD_BIT(action.val.keycode));
             } else {
