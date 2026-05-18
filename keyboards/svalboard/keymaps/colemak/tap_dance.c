@@ -280,45 +280,44 @@ static td_action_t td_lookup_action(const td_runtime_t *rt, td_state_t state) {
 // ----------------------------------------------------------------------------
 // Execute/Cleanup
 
-static uint16_t td_resolve_keycode(td_action_t *action, td_shift_t sh) {
-    switch (action->type) {
-        case TD_ACT_KC:
-            return sh.effective
-                ? LSFT(action->val.keycode)
-                : action->val.keycode;
-
-        case TD_ACT_KC_SFT:
-            if (sh.phys)
-                return action->val.kc_pair.shifted;
-
-            return sh.caps
-                ? LSFT(action->val.kc_pair.base)
-                : action->val.kc_pair.base;
-
-        default:
-            return 0;
-    }
-}
-
-static void td_emit(td_runtime_t *rt, td_action_t action, bool hold)
-{
+static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
     td_shift_t sh = td_get_shift();
 
     rt->active.action = action;
     rt->active.active = true;
 
     switch (action.type) {
-        case TD_ACT_KC:
-        case TD_ACT_KC_SFT: {
-            uint16_t kc = td_resolve_keycode(&action, sh);
-            if (!kc) return;
-
-            rt->active.emitted_kc = kc;
+        case TD_ACT_KC: {
+            rt->active.emitted_kc = sh.effective
+                ? LSFT(action.val.keycode)
+                : action.val.keycode;
 
             if (hold) {
-                register_code16(kc);
+                register_code16(rt->active.emitted_kc);
             } else {
-                tap_code16(kc);
+                bool suppress = sh.phys && !sh.effective;
+                if (suppress) { del_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
+                tap_code16(rt->active.emitted_kc);
+                if (suppress) { add_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
+                mouse_mode(false);
+            }
+
+            break;
+        }
+
+        case TD_ACT_KC_SFT: {
+            rt->active.emitted_kc = sh.phys
+                ? action.val.kc_pair.shifted
+                : sh.caps
+                    ? LSFT(action.val.kc_pair.base)
+                    : action.val.kc_pair.base;
+
+            if (hold) {
+                register_code16(rt->active.emitted_kc);
+            } else {
+                if (sh.phys) { del_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
+                tap_code16(rt->active.emitted_kc);
+                if (sh.phys) { add_mods(MOD_MASK_SHIFT); send_keyboard_report(); }
                 mouse_mode(false);
             }
 
@@ -329,7 +328,7 @@ static void td_emit(td_runtime_t *rt, td_action_t action, bool hold)
             if (hold) {
                 register_mods(MOD_BIT(action.val.keycode));
             } else {
-                tap_code16(MOD_BIT(action.val.keycode));
+                tap_code16(action.val.keycode);
                 mouse_mode(false);
             }
 
@@ -374,6 +373,9 @@ static void td_release(td_runtime_t *rt) {
             break;
     }
 
+    if (action->reset_fn)
+        action->reset_fn(action->ctx);
+
     rt->active.active = false;
     rt->active.action = td_action_none();
 
@@ -386,6 +388,7 @@ static void td_release(td_runtime_t *rt) {
 
 static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *rt = user_data;
+    if (rt->active.active) return;
 
     td_bind_cfg(rt);
     if (!rt->cfg)
@@ -405,21 +408,24 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
 
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *rt = user_data;
-    if (rt->active.active)
-        return;
 
     td_bind_cfg(rt);
     if (!rt->cfg)
         return;
 
     td_state_t td_state = td_dance_step(state);
-    if (td_state == TD_SINGLE_HOLD ||
-        td_state == TD_DOUBLE_HOLD ||
-        td_state == TD_TRIPLE_HOLD) {
+    if (td_state != TD_SINGLE_HOLD &&
+        td_state != TD_DOUBLE_HOLD &&
+        td_state != TD_TRIPLE_HOLD)
+        return;
 
-        td_action_t action = td_lookup_action(rt, td_state);
-        td_emit(rt, action, true);
-    }
+    // Hold can override an intermediate tap already emitted by on_each_release
+    // (e.g. first release of a double-hold). Prior emit was tap_code16 (already up),
+    // so just clear the tracking flag — no unregister needed.
+    rt->active.active = false;
+
+    td_action_t action = td_lookup_action(rt, td_state);
+    td_emit(rt, action, true);
 }
 
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
