@@ -36,6 +36,7 @@ typedef enum {
     TD_ACT_KC_SFT,
     TD_ACT_MOD,
     TD_ACT_LMV,
+    TD_ACT_LT,
     TD_ACT_FN,
 } td_action_type_t;
 
@@ -117,10 +118,16 @@ typedef struct {
         .val.keycode = (kc),    \
     })
 
-#define TD_LMV(l)           \
-    ((td_action_t){         \
-        .type = TD_ACT_LMV, \
-        .val.layer = (l),   \
+#define TD_LMV(layer_)          \
+    ((td_action_t){             \
+        .type = TD_ACT_LMV,     \
+        .val.layer = (layer_),  \
+    })
+
+#define TD_LT(layer_)           \
+    ((td_action_t){             \
+        .type = TD_ACT_LT,      \
+        .val.layer = (layer_),  \
     })
 
 #define TD_FN(...) OVERLOAD3(__VA_ARGS__, TD_FN3, TD_FN2, TD_FN1)(__VA_ARGS__)
@@ -167,31 +174,6 @@ typedef struct {
             on_dance_release    \
         },                      \
         .user_data = &name##_rt \
-    }
-
-// ----------------------------------------------------------------------------
-// Layers
-
-#define RETURN_LAYER_NOT_SET 13
-
-static uint8_t return_layer = RETURN_LAYER_NOT_SET;
-static uint8_t return_layer_cnt = 0;
-
-#define LAYER_PUSH(layer)                               \
-    mouse_mode(false);                                  \
-    if (return_layer_cnt == 0) {                        \
-        return_layer = get_highest_layer(layer_state);  \
-    }                                                   \
-    return_layer_cnt++;                                 \
-    layer_move(layer)
-
-#define LAYER_RESTORE()                             \
-    if (return_layer_cnt > 0) {                     \
-        return_layer_cnt--;                         \
-        if (return_layer_cnt == 0) {                \
-            layer_move(return_layer);               \
-            return_layer = RETURN_LAYER_NOT_SET;    \
-        }                                           \
     }
 
 // ----------------------------------------------------------------------------
@@ -334,19 +316,21 @@ static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
         }
 
         case TD_ACT_MOD:
-            break_caps_word(action.val.keycode);
-
             if (hold) {
+                break_caps_word(action.val.keycode);
                 register_mods(MOD_BIT(action.val.keycode));
-            } else {
-                tap_code16(action.val.keycode);
-                mouse_mode(false);
             }
 
             break;
 
         case TD_ACT_LMV:
-            LAYER_PUSH(action.val.layer);
+            layer_move(action.val.layer);
+            mouse_mode(false);
+            break;
+
+        case TD_ACT_LT:
+            layer_on(action.val.layer);
+            mouse_mode(false);
             break;
 
         case TD_ACT_FN:
@@ -376,8 +360,9 @@ static void td_release(td_runtime_t *rt) {
             mouse_mode(false);
             break;
 
-        case TD_ACT_LMV:
-            LAYER_RESTORE();
+        case TD_ACT_LT:
+            layer_off(action->val.layer);
+            mouse_mode(false);
             break;
 
         default:
@@ -502,19 +487,19 @@ TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
 TD_CFG(ckc_spc,
     TD_MAP(TD_SINGLE_TAP, TD_KC(KC_SPC)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NUM))
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NUM))
 );
 TD_RUNTIME(ckc_spc, ckc_spc);
 
 TD_CFG(ckc_tab,
     TD_MAP(TD_SINGLE_TAP, TD_KC(KC_TAB)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_SYM))
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_SYM))
 );
 TD_RUNTIME(ckc_tab, ckc_tab);
 
 TD_CFG(ckc_bspc,
     TD_MAP(TD_SINGLE_TAP,  TD_KC_SFT(KC_BSPC, KC_DEL)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LMV(_NAV))
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NAV))
 );
 TD_RUNTIME(ckc_bspc, ckc_bspc);
 
