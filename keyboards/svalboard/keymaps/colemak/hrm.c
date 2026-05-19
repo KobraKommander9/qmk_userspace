@@ -25,19 +25,19 @@ uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case HRM_A:
         case HRM_O:
-            return TAPPING_TERM + 5;
+            return TAPPING_TERM - 15;
 
         case HRM_R:
         case HRM_I:
-            return TAPPING_TERM + 10;
+            return TAPPING_TERM - 10;
 
         case HRM_S:
         case HRM_E:
-            return TAPPING_TERM + 15;
+            return TAPPING_TERM - 5;
 
-        case HRM_A:
-        case HRM_O:
-            return TAPPING_TERM + 5;
+        case HRM_T:
+        case HRM_N:
+            return TAPPING_TERM - 15;
     }
 
     return TAPPING_TERM;
@@ -80,17 +80,15 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
         case HRM_R:
         case HRM_S:
         case HRM_T: {
-            if (!hrm_active(HRM_HAND_LEFT) && !record->tap.count && record->event.pressed) {
+            if (!hrm_active(HRM_HAND_LEFT) && !record->tap.count) {
                 uint16_t kc = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
-                break_caps_word(kc);
-
                 if (record->event.pressed) {
+                    break_caps_word(kc);
                     register_code(kc);
                 } else {
                     unregister_code(kc);
                     mouse_mode(false);
                 }
-
                 return false;
             }
 
@@ -101,17 +99,15 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
         case HRM_E:
         case HRM_I:
         case HRM_O: {
-            if (!hrm_active(HRM_HAND_RIGHT) && !record->tap.count && record->event.pressed) {
+            if (!hrm_active(HRM_HAND_RIGHT) && !record->tap.count) {
                 uint16_t kc = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
-                break_caps_word(kc);
-
                 if (record->event.pressed) {
+                    break_caps_word(kc);
                     register_code(kc);
                 } else {
                     unregister_code(kc);
                     mouse_mode(false);
                 }
-
                 return false;
             }
 

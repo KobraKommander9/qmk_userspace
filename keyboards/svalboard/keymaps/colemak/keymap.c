@@ -88,10 +88,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*R3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
         /*R4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
-        /*L1*/ KC_KP_6,            KC_KP_9,            KC_KP_0,            KC_KP_3,            KC_PEQL,            XXXXXXX,
-        /*L2*/ KC_KP_5,            KC_KP_8,            XXXXXXX,            KC_KP_2,            KC_PSLS,            XXXXXXX,
-        /*L3*/ KC_KP_4,            KC_KP_7,            XXXXXXX,            KC_KP_1,            KC_PCMM,            XXXXXXX,
-        /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_PDOT,            XXXXXXX,
+        /*L1*/ KC_6,               KC_9,               KC_0,               KC_3,               KC_PEQL,            XXXXXXX,
+        /*L2*/ KC_5,               KC_8,               XXXXXXX,            KC_2,               KC_PSLS,            XXXXXXX,
+        /*L3*/ KC_4,               KC_7,               XXXXXXX,            KC_1,               KC_PCMM,            XXXXXXX,
+        /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_DOT,             XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
