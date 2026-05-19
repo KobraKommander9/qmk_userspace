@@ -35,6 +35,7 @@ typedef enum {
     TD_ACT_NONE,
     TD_ACT_KC,
     TD_ACT_KC_SFT,
+    TD_ACT_TAP_HOLD,
     TD_ACT_MOD,
     TD_ACT_LMV,
     TD_ACT_LT,
@@ -68,6 +69,7 @@ typedef struct {
 typedef struct {
     const td_action_map_t *map;
     uint8_t len;
+    bool hold_on_interrupt;
 } td_config_t;
 
 typedef const td_config_t *(*td_resolver_t)(const void *);
@@ -85,16 +87,8 @@ typedef struct {
     const void *resolve_ctx;
 
     td_action_instance_t active;
+    bool rapid;
 } td_runtime_t;
-
-typedef struct {
-    uint16_t kc;
-    bool active;
-} td_press_t;
-
-typedef struct {
-    bool hold;
-} td_commit_t;
 
 // ----------------------------------------------------------------------------
 // Action constructors
@@ -105,6 +99,12 @@ typedef struct {
     ((td_action_t){             \
         .type = TD_ACT_KC,      \
         .val.keycode = (kc),    \
+    })
+
+#define TD_TAP_HOLD(kc)             \
+    ((td_action_t){                 \
+        .type = TD_ACT_TAP_HOLD,    \
+        .val.keycode = (kc),        \
     })
 
 #define TD_KC_SFT(base, shifted)                \
@@ -154,6 +154,16 @@ typedef struct {
         .len = ARRAY_SIZE(name##_map),              \
     }
 
+#define TD_CFG_HOI(name, ...)                       \
+    static const td_action_map_t name##_map[] = {   \
+        __VA_ARGS__                                 \
+    };                                              \
+    static const td_config_t name##_cfg = {         \
+        .map = name##_map,                          \
+        .len = ARRAY_SIZE(name##_map),              \
+        .hold_on_interrupt = true,                  \
+    }
+
 #define TD_RUNTIME(name, cfgname)       \
     static td_runtime_t name##_rt = {   \
         .cfg = &cfgname##_cfg,          \
@@ -169,7 +179,7 @@ typedef struct {
 #define TD_ACTION(name)         \
     {                           \
         .fn = {                 \
-            NULL,               \
+            on_dance_each_tap,  \
             on_dance_finished,  \
             on_dance_reset,     \
             on_dance_release    \
@@ -211,36 +221,44 @@ static td_state_t td_dance_step(tap_dance_state_t *s) {
     return TD_MORE_TAPS;
 }
 
-static td_state_t td_get_fallback(td_state_t state) {
-    switch (state) {
-        case TD_SINGLE_HOLD: return TD_SINGLE_TAP;
-        case TD_DOUBLE_TAP: return TD_SINGLE_TAP;
-        case TD_DOUBLE_HOLD: return TD_DOUBLE_TAP;
-        case TD_DOUBLE_SINGLE_TAP: return TD_DOUBLE_TAP;
-        case TD_TRIPLE_TAP: return TD_DOUBLE_TAP;
-        case TD_TRIPLE_HOLD: return TD_TRIPLE_TAP;
-        case TD_TRIPLE_SINGLE_TAP: return TD_TRIPLE_TAP;
-        case TD_MORE_TAPS: return TD_TRIPLE_TAP;
-        default: return TD_UNKNOWN;
-    }
-}
-
 static td_action_t td_lookup_action(const td_runtime_t *rt, td_state_t state) {
     if (!rt->cfg)
         return td_action_none();
 
     const td_config_t *cfg = rt->cfg;
-    td_state_t candidate = state;
-
-    while (candidate != TD_UNKNOWN) {
-        for (uint8_t i = 0; i < cfg->len; i++) {
-            if (cfg->map[i].state == candidate)
-                return cfg->map[i].action;
-        }
-        candidate = td_get_fallback(candidate);
+    for (uint8_t i = 0; i < cfg->len; i++) {
+        if (cfg->map[i].state == state)
+            return cfg->map[i].action;
     }
 
     return td_action_none();
+}
+
+// Depth based only on tap-type states (used for on_each_tap overflow threshold)
+static td_depth_t td_tap_depth(const td_config_t *cfg) {
+    td_depth_t depth = TD_DEPTH_SINGLE;
+
+    for (uint8_t i = 0; i < cfg->len; i++) {
+        td_state_t s = cfg->map[i].state;
+
+        if (s == TD_TRIPLE_TAP || s == TD_TRIPLE_SINGLE_TAP) return TD_DEPTH_TRIPLE;
+        if (s == TD_DOUBLE_TAP || s == TD_DOUBLE_SINGLE_TAP) depth = TD_DEPTH_DOUBLE;
+    }
+
+    return depth;
+}
+
+// True if any multi-tap (non-hold) actions defined — blocks immediate on_dance_release
+static bool td_has_multi_tap(const td_config_t *cfg) {
+    for (uint8_t i = 0; i < cfg->len; i++) {
+        td_state_t s = cfg->map[i].state;
+
+        if (s == TD_DOUBLE_TAP || s == TD_DOUBLE_SINGLE_TAP ||
+            s == TD_TRIPLE_TAP || s == TD_TRIPLE_SINGLE_TAP)
+            return true;
+    }
+
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -279,6 +297,13 @@ static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
             break;
         }
 
+        case TD_ACT_TAP_HOLD:
+            rt->active.emitted_kc = action.val.keycode;
+            tap_code16(action.val.keycode);
+            mouse_mode(false);
+            register_code16(action.val.keycode);
+            break;
+
         case TD_ACT_MOD:
             if (hold) {
                 break_caps_word(action.val.keycode);
@@ -315,6 +340,7 @@ static void td_release(td_runtime_t *rt) {
     switch (action->type) {
         case TD_ACT_KC:
         case TD_ACT_KC_SFT:
+        case TD_ACT_TAP_HOLD:
             unregister_code16(rt->active.emitted_kc);
             mouse_mode(false);
             break;
@@ -346,57 +372,91 @@ static void td_release(td_runtime_t *rt) {
 // ----------------------------------------------------------------------------
 // Callbacks
 
+static void on_dance_each_tap(tap_dance_state_t *state, void *user_data) {
+    td_runtime_t *rt = user_data;
+    td_bind_cfg(rt);
+    if (!rt->cfg) return;
+
+    td_depth_t depth = td_tap_depth(rt->cfg);
+    uint8_t threshold = (depth == TD_DEPTH_TRIPLE) ? 3 :
+                        (depth == TD_DEPTH_DOUBLE) ? 2 : 1;
+
+    if (state->count <= threshold) return;
+
+    td_action_t action = td_lookup_action(rt, TD_SINGLE_TAP);
+
+    uint16_t kc;
+    if (action.type == TD_ACT_KC) {
+        kc = action.val.keycode;
+    } else if (action.type == TD_ACT_KC_SFT) {
+        shift_state_t sh = get_shift_state();
+        kc = sh.phys ? action.val.kc_pair.shifted : action.val.kc_pair.base;
+    } else {
+        return;
+    }
+
+    if (depth == TD_DEPTH_SINGLE) {
+        // on_dance_release already emitted one tap per key-up; emit one more
+        tap_code16(kc);
+    } else if (state->count == threshold + 1) {
+        // First overflow: on_dance_release was suppressed, emit all taps retroactively
+        for (uint8_t i = 0; i < state->count; i++) tap_code16(kc);
+    } else {
+        tap_code16(kc);
+    }
+
+    rt->rapid = true;
+}
+
 static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *rt = user_data;
     if (rt->active.active) return;
+    if (rt->rapid) return;
 
     td_bind_cfg(rt);
-    if (!rt->cfg)
-        return;
+    if (!rt->cfg) return;
 
-    td_state_t td_state = td_dance_step(state);
-    if (td_state == TD_SINGLE_TAP ||
-        td_state == TD_DOUBLE_TAP ||
-        td_state == TD_TRIPLE_TAP ||
-        td_state == TD_DOUBLE_SINGLE_TAP ||
-        td_state == TD_TRIPLE_SINGLE_TAP ||
-        td_state == TD_MORE_TAPS) {
+    // Multi-tap configs emit in on_dance_finished to avoid double-emit
+    // (count=1 release fires SINGLE_TAP, count=2 release fires DOUBLE_TAP)
+    if (td_has_multi_tap(rt->cfg)) return;
 
-        td_action_t action = td_lookup_action(rt, td_state);
-        td_emit(rt, action, false);
-        rt->active.active = false;  // tap_code16 is synchronous; no release tracking needed
-    }
+    if (td_dance_step(state) != TD_SINGLE_TAP) return;
+
+    td_action_t action = td_lookup_action(rt, TD_SINGLE_TAP);
+    td_emit(rt, action, false);
+    rt->active.active = false;
 }
 
 static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_runtime_t *rt = user_data;
 
+    if (rt->rapid) { rt->rapid = false; return; }
+
     td_bind_cfg(rt);
-    if (!rt->cfg)
-        return;
+    if (!rt->cfg) return;
 
     td_state_t td_state = td_dance_step(state);
 
-    // Hold-on-interrupt: if held while another key pressed, fire hold immediately
-    if (state->interrupted && state->pressed) {
+    if (rt->cfg->hold_on_interrupt && state->interrupted && state->pressed) {
         if      (td_state == TD_SINGLE_TAP)        td_state = TD_SINGLE_HOLD;
         else if (td_state == TD_DOUBLE_SINGLE_TAP) td_state = TD_DOUBLE_HOLD;
         else if (td_state == TD_TRIPLE_SINGLE_TAP) td_state = TD_TRIPLE_HOLD;
     }
 
-    if (td_state != TD_SINGLE_HOLD &&
-        td_state != TD_DOUBLE_HOLD &&
-        td_state != TD_TRIPLE_HOLD &&
-        td_state != TD_MORE_TAPS)
-        return;
+    bool is_hold = (td_state == TD_SINGLE_HOLD ||
+                    td_state == TD_DOUBLE_HOLD  ||
+                    td_state == TD_TRIPLE_HOLD);
 
-    // Hold can override an intermediate tap already emitted by on_each_release
-    // (e.g. first release of a double-hold). Prior emit was tap_code16 (already up),
-    // so just clear the tracking flag — no unregister needed.
-    rt->active.active = false;
+    // SINGLE-depth tap states handled by on_dance_release (responsive path)
+    if (!is_hold && !td_has_multi_tap(rt->cfg)) return;
 
     td_action_t action = td_lookup_action(rt, td_state);
-    td_emit(rt, action, true);
+    if (action.type == TD_ACT_NONE) return;
+
+    td_emit(rt, action, is_hold);
+
+    if (!is_hold && action.type != TD_ACT_TAP_HOLD)
+        rt->active.active = false;
 }
 
 static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
@@ -408,20 +468,23 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
 // Definitions
 
 TD_CFG(ckc_spc,
-    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_SPC)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NUM))
+    TD_MAP(TD_SINGLE_TAP,  TD_KC(KC_SPC)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NUM)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_SPC))
 );
 TD_RUNTIME(ckc_spc, ckc_spc);
 
 TD_CFG(ckc_tab,
-    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_TAB)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LT(_SYM))
+    TD_MAP(TD_SINGLE_TAP,  TD_KC(KC_TAB)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_SYM)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_TAB))
 );
 TD_RUNTIME(ckc_tab, ckc_tab);
 
 TD_CFG(ckc_bspc,
     TD_MAP(TD_SINGLE_TAP,  TD_KC_SFT(KC_BSPC, KC_DEL)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NAV))
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NAV)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC_SFT(KC_BSPC, KC_DEL))
 );
 TD_RUNTIME(ckc_bspc, ckc_bspc);
 
