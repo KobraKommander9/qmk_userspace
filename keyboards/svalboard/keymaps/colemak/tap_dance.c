@@ -378,11 +378,15 @@ static void on_dance_each_tap(tap_dance_state_t *state, void *user_data) {
     if (!rt->cfg) return;
 
     td_depth_t depth = td_tap_depth(rt->cfg);
-    uint8_t threshold = (depth == TD_DEPTH_TRIPLE) ? 3 :
-                        (depth == TD_DEPTH_DOUBLE) ? 2 : 1;
+
+    // SINGLE-depth: on_dance_release emits one char per key-up; nothing to do here
+    if (depth == TD_DEPTH_SINGLE) return;
+
+    uint8_t threshold = (depth == TD_DEPTH_TRIPLE) ? 3 : 2;
 
     if (state->count <= threshold) return;
 
+    // on_dance_release suppressed for multi-tap configs; emit retroactively on first overflow
     td_action_t action = td_lookup_action(rt, TD_SINGLE_TAP);
 
     uint16_t kc;
@@ -395,11 +399,7 @@ static void on_dance_each_tap(tap_dance_state_t *state, void *user_data) {
         return;
     }
 
-    if (depth == TD_DEPTH_SINGLE) {
-        // on_dance_release already emitted one tap per key-up; emit one more
-        tap_code16(kc);
-    } else if (state->count == threshold + 1) {
-        // First overflow: on_dance_release was suppressed, emit all taps retroactively
+    if (state->count == threshold + 1) {
         for (uint8_t i = 0; i < state->count; i++) tap_code16(kc);
     } else {
         tap_code16(kc);
@@ -416,11 +416,16 @@ static void on_dance_release(tap_dance_state_t *state, void *user_data) {
     td_bind_cfg(rt);
     if (!rt->cfg) return;
 
-    // Multi-tap configs emit in on_dance_finished to avoid double-emit
-    // (count=1 release fires SINGLE_TAP, count=2 release fires DOUBLE_TAP)
+    // Multi-tap (tap-type doubles/triples) configs wait for on_dance_finished
     if (td_has_multi_tap(rt->cfg)) return;
 
-    if (td_dance_step(state) != TD_SINGLE_TAP) return;
+    // Emit single-tap keycode on every non-hold release:
+    // count=1 → immediate tap; count=2,3,... → one more per rapid press
+    td_state_t td_state = td_dance_step(state);
+    bool is_hold = (td_state == TD_SINGLE_HOLD ||
+                    td_state == TD_DOUBLE_HOLD  ||
+                    td_state == TD_TRIPLE_HOLD);
+    if (is_hold) return;
 
     td_action_t action = td_lookup_action(rt, TD_SINGLE_TAP);
     td_emit(rt, action, false);
