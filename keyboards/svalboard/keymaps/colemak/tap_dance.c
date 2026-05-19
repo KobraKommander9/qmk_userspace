@@ -3,6 +3,7 @@
 #include "hrm.h"
 #include "layers.h"
 #include "keys.h"
+#include "shift.h"
 
 // ----------------------------------------------------------------------------
 // Types
@@ -177,43 +178,6 @@ typedef struct {
     }
 
 // ----------------------------------------------------------------------------
-// Shift Handling
-
-typedef struct {
-    bool phys;
-    bool caps;
-    bool effective;
-} td_shift_t;
-
-static inline td_shift_t td_get_shift(void) {
-    bool phys = (get_mods() & MOD_MASK_SHIFT);
-    bool caps  = is_caps_word_on() || host_keyboard_led_state().caps_lock;
-
-    return (td_shift_t){
-        .phys = phys,
-        .caps = caps,
-        .effective = phys ^ caps,
-    };
-}
-
-static void break_caps_word(uint16_t kc) {
-    if (!is_caps_word_on()) return;
-
-    switch (kc) {
-        case KC_A ... KC_Z:
-        case KC_1 ... KC_0:
-        case KC_MINS:
-        case KC_BSPC:
-        case KC_DEL:
-        case KC_UNDS:
-            break;
-
-        default:
-            caps_word_off();
-    }
-}
-
-// ----------------------------------------------------------------------------
 // Runtime helpers
 
 static inline td_action_t td_action_none(void) {
@@ -300,7 +264,7 @@ static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
 
     switch (action.type) {
         case TD_ACT_KC: {
-            td_shift_t sh = td_get_shift();
+            shift_state_t sh = get_shift_state();
             break_caps_word(action.val.keycode);
             uint16_t kc = sh.effective ? LSFT(action.val.keycode) : action.val.keycode;
             td_emit_kc16(rt, kc, hold, sh.phys && sh.caps);
@@ -308,7 +272,7 @@ static void td_emit(td_runtime_t *rt, td_action_t action, bool hold) {
         }
 
         case TD_ACT_KC_SFT: {
-            td_shift_t sh = td_get_shift();
+            shift_state_t sh = get_shift_state();
             uint16_t kc = sh.phys ? action.val.kc_pair.shifted : action.val.kc_pair.base;
             break_caps_word(kc);
             td_emit_kc16(rt, sh.caps && !sh.phys ? LSFT(kc) : kc, hold, sh.phys);
@@ -414,7 +378,7 @@ static void on_dance_finished(tap_dance_state_t *state, void *user_data) {
     td_state_t td_state = td_dance_step(state);
 
     // Hold-on-interrupt: if held while another key pressed, fire hold immediately
-    if (state->interrupted && state->pressed /* && rt->cfg->retro_term > 0 */) {
+    if (state->interrupted && state->pressed) {
         if      (td_state == TD_SINGLE_TAP)        td_state = TD_SINGLE_HOLD;
         else if (td_state == TD_DOUBLE_SINGLE_TAP) td_state = TD_DOUBLE_HOLD;
         else if (td_state == TD_TRIPLE_SINGLE_TAP) td_state = TD_TRIPLE_HOLD;
@@ -441,49 +405,7 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
 }
 
 // ----------------------------------------------------------------------------
-// HRM Resolver
-
-typedef struct {
-    hrm_hand_t hand;
-
-    const td_config_t *enabled;
-    const td_config_t *disabled;
-} hrm_td_ctx_t;
-
-static const td_config_t *hrm_resolver(const void *ctx) {
-    const hrm_td_ctx_t *hrm = ctx;
-    return hrm_active(hrm->hand)
-        ? hrm->enabled
-        : hrm->disabled;
-}
-
-#define TD_HRM(name, kc, mod, hand_)                        \
-    TD_CFG(name##_enabled,                                  \
-        TD_MAP(TD_SINGLE_TAP, TD_KC(kc)),                   \
-        TD_MAP(TD_SINGLE_HOLD, TD_MOD(mod))                 \
-    );                                                      \
-    TD_CFG(name##_disabled,                                 \
-        TD_MAP(TD_SINGLE_TAP, TD_KC(kc))                    \
-    );                                                      \
-    static const hrm_td_ctx_t name##_ctx = {                \
-        .hand = (hand_),                                    \
-        .enabled = &name##_enabled_cfg,                     \
-        .disabled = &name##_disabled_cfg,                   \
-    };                                                      \
-    TD_RUNTIME_RESOLVED(name, hrm_resolver, &name##_ctx)
-
-// ----------------------------------------------------------------------------
 // Definitions
-
-TD_HRM(hrm_a, KC_A, KC_LGUI, HRM_HAND_LEFT);
-TD_HRM(hrm_r, KC_R, KC_LALT, HRM_HAND_LEFT);
-TD_HRM(hrm_s, KC_S, KC_LSFT, HRM_HAND_LEFT);
-TD_HRM(hrm_t, KC_T, KC_LCTL, HRM_HAND_LEFT);
-
-TD_HRM(hrm_n, KC_N, KC_RCTL, HRM_HAND_RIGHT);
-TD_HRM(hrm_e, KC_E, KC_RSFT, HRM_HAND_RIGHT);
-TD_HRM(hrm_i, KC_I, KC_LALT, HRM_HAND_RIGHT);
-TD_HRM(hrm_o, KC_O, KC_RGUI, HRM_HAND_RIGHT);
 
 TD_CFG(ckc_spc,
     TD_MAP(TD_SINGLE_TAP, TD_KC(KC_SPC)),
@@ -507,16 +429,6 @@ TD_RUNTIME(ckc_bspc, ckc_bspc);
 // Table
 
 USER_TAP_DANCE_TABLE(
-    [TDE_HRM_A] = TD_ACTION(hrm_a),
-    [TDE_HRM_R] = TD_ACTION(hrm_r),
-    [TDE_HRM_S] = TD_ACTION(hrm_s),
-    [TDE_HRM_T] = TD_ACTION(hrm_t),
-
-    [TDE_HRM_N] = TD_ACTION(hrm_n),
-    [TDE_HRM_E] = TD_ACTION(hrm_e),
-    [TDE_HRM_I] = TD_ACTION(hrm_i),
-    [TDE_HRM_O] = TD_ACTION(hrm_o),
-
     [TDE_CK_BSPC] = TD_ACTION(ckc_bspc),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),

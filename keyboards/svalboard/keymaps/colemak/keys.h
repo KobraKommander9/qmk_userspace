@@ -17,15 +17,15 @@
 #define SV_RDPD SV_RIGHT_DPI_DEC
 #define SV_SOUT SV_OUTPUT_STATUS
 
-#define HRM_A USER_TD(TDE_HRM_A)
-#define HRM_R USER_TD(TDE_HRM_R)
-#define HRM_S USER_TD(TDE_HRM_S)
-#define HRM_T USER_TD(TDE_HRM_T)
+#define HRM_A LGUI_T(KC_A)
+#define HRM_R LALT_T(KC_R)
+#define HRM_S LSFT_T(KC_S)
+#define HRM_T LCTL_T(KC_T)
 
-#define HRM_N USER_TD(TDE_HRM_N)
-#define HRM_E USER_TD(TDE_HRM_E)
-#define HRM_I USER_TD(TDE_HRM_I)
-#define HRM_O USER_TD(TDE_HRM_O)
+#define HRM_N RCTL_T(KC_N)
+#define HRM_E RSFT_T(KC_E)
+#define HRM_I LALT_T(KC_I)
+#define HRM_O RGUI_T(KC_O)
 
 #define CKC_BSPC USER_TD(TDE_CK_BSPC)
 #define CKC_SPC USER_TD(TDE_CK_SPC)
