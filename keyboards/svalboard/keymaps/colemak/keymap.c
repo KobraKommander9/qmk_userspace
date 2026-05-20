@@ -83,9 +83,9 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_NUM] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
-        /*R1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*R2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*R3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*R1*/ KC_F4,              KC_F7,              KC_0,               KC_F1,              _______,            XXXXXXX,
+        /*R2*/ KC_F5,              KC_F8,              _______,            KC_F2,              _______,            XXXXXXX,
+        /*R3*/ KC_F6,              KC_F9,              _______,            KC_F3,              _______,            XXXXXXX,
         /*R4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*L1*/ KC_6,               KC_9,               KC_0,               KC_3,               KC_PEQL,            XXXXXXX,
@@ -94,7 +94,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_DOT,             XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*RT*/ _______,            _______,            KC_LCTL,            KC_LALT,            XXXXXXX,            XXXXXXX,
         /*LT*/ KC_PENT,            KC_BSPC,            _______,            KC_SPC,             KC_TAB,             XXXXXXX
         ),
 
