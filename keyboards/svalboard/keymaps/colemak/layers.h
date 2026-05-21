@@ -11,6 +11,7 @@ enum layer_names {
     _NAV,                   // Navigation layer.
     _NUM,                   // Numbers layer.
     _SYM,                   // Symbol layer.
+    _MEDIA,                 // Media layer.
     _SYS = LAST_LAYER - 1,  // Svalboard specific keys layer.
     _MBO = LAST_LAYER,      // Mouse buttons layer.
 };

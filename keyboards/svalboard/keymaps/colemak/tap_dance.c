@@ -493,6 +493,18 @@ TD_CFG(ckc_bspc,
 );
 TD_RUNTIME(ckc_bspc, ckc_bspc);
 
+TD_CFG(ckc_media,
+    TD_MAP(TD_DOUBLE_TAP, TD_LT(_MEDIA)),
+    TD_MAP(TD_TRIPLE_TAP, TD_KC(HRM_TOGGLE))
+);
+TD_RUNTIME(ckc_media, ckc_media);
+
+TD_CFG(ckc_game,
+    TD_MAP(TD_DOUBLE_TAP, TD_LT(_GAME1))
+);
+TD_RUNTIME(ckc_game, ckc_game);
+
+
 // ----------------------------------------------------------------------------
 // Table
 
@@ -500,4 +512,6 @@ USER_TAP_DANCE_TABLE(
     [TDE_CK_BSPC] = TD_ACTION(ckc_bspc),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),
+    [TDE_CK_MEDIA] = TD_ACTION(ckc_media),
+    [TDE_CK_GAME] = TD_ACTION(ckc_game),
 );

@@ -26,8 +26,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CW_TOGG         , MO(_SYS)          , XXXXXXX           ,
-        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_TAB         , TO(_GAME1)        , HRM_TOGGLE
+        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CKC_MEDIA       , MO(_SYS)          , XXXXXXX           ,
+        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , XXXXXXX           , XXXXXXX
         ),
 
     [_GAME1] = LAYOUT(
@@ -44,7 +44,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ KC_LCTL,            KC_BTN1,            KC_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ KC_SPC,             MO(_GAME2),         KC_ESC,             SV_SNIPER_5,        SV_SNIPER_3,        TO(_BASE)
+        /*LT*/ KC_BTN2,            KC_SPC,             KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
         ),
 
     [_GAME2] = LAYOUT(
@@ -115,12 +115,29 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
         ),
 
+    [_MEDIA] = LAYOUT(
+        /*     Center              North               East                South               West                Double*/
+        /*R1*/ M_NEXT,             M_VOL_DN,           XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R2*/ M_PREV,             M_VOL_UP,           XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R3*/ M_PLAY,             XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R4*/ M_STOP,             XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+
+        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
+        /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
+        ),
+
     [_SYS] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
         /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*R4*/ TO(_BASE),          XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*L1*/ XXXXXXX,            KC_BRIU,            XXXXXXX,            KC_BRID,            XXXXXXX,            XXXXXXX,
         /*L2*/ XXXXXXX,            SV_RDPU,            XXXXXXX,            SV_RDPD,            XXXXXXX,            XXXXXXX,
@@ -128,8 +145,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ KC_PWR,             XXXXXXX,            XXXXXXX,            KC_SLEP,            XXXXXXX,            XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*LT*/ SV_SOUT,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+        /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
+        /*LT*/ SV_SOUT,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
         ),
 
     [_MBO] = LAYOUT(
@@ -175,8 +192,8 @@ void keyboard_post_init_user(void) {
     global_saved_values.left_scroll = true;
     global_saved_values.right_scroll = false;
     global_saved_values.auto_mouse = true;
-    global_saved_values.left_dpi_index = MOUSE_DPI_400;
-    global_saved_values.right_dpi_index = MOUSE_DPI_1200;
+    global_saved_values.left_dpi_index = MOUSE_DPI_800;
+    global_saved_values.right_dpi_index = MOUSE_DPI_800;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_hrm_keys();
