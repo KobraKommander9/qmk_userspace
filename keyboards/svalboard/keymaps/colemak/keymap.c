@@ -27,7 +27,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
         /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CKC_MEDIA       , MO(_SYS)          , XXXXXXX           ,
-        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , XXXXXXX           , XXXXXXX
+        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , XXXXXXX           , TO(_GAME1)
         ),
 
     [_GAME1] = LAYOUT(
