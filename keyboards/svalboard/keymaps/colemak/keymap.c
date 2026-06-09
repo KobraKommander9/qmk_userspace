@@ -77,7 +77,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_LALT,            KC_TAB,             XXXXXXX,            MKC_BKTAB,          XXXXXXX,            XXXXXXX,
+        /*RT*/ KC_LALT,            KC_TAB,             XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
         ),
 
