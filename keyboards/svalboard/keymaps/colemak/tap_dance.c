@@ -164,7 +164,12 @@ typedef struct {
         .hold_on_interrupt = true,                  \
     }
 
-#define TD_RUNTIME(name, cfgname)       \
+#define TD_RUNTIME(name)                \
+    static td_runtime_t name##_rt = {   \
+        .cfg = &name##_cfg,             \
+    }
+
+#define TD_RUNTIME_CFG(name, cfgname)   \
     static td_runtime_t name##_rt = {   \
         .cfg = &cfgname##_cfg,          \
     }
@@ -472,46 +477,60 @@ static void on_dance_reset(tap_dance_state_t *state, void *user_data) {
 // ----------------------------------------------------------------------------
 // Definitions
 
+TD_CFG(ckc_bspc,
+    TD_MAP(TD_SINGLE_TAP,  TD_KC_SFT(KC_BSPC, KC_DEL)),
+    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NAV)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC_SFT(KC_BSPC, KC_DEL))
+);
+TD_RUNTIME(ckc_bspc);
+
+TD_CFG(ckc_exlm,
+    TD_MAP(TD_SINGLE_TAP, TD_KC_SFT(KC_EXLM, KC_AMPR)),
+    TD_MAP(TD_DOUBLE_TAP, TD_KC_SFT(KC_ASTR, KC_HASH)),
+);
+TD_RUNTIME(ckc_exlm);
+
+TD_CFG(ckc_game,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_TAB)),
+    TD_MAP(TD_DOUBLE_TAP, TD_LT(_GAME1))
+);
+TD_RUNTIME(ckc_game);
+
+TD_CFG(ckc_grv,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_GRV)),
+    TD_MAP(TD_DOUBLE_TAP, TD_KC(KC_PERC)),
+);
+TD_RUNTIME(ckc_grv);
+
+TD_CFG(ckc_media,
+    TD_MAP(TD_DOUBLE_TAP, TD_LT(_MEDIA)),
+    TD_MAP(TD_TRIPLE_TAP, TD_KC(HRM_TOGGLE))
+);
+TD_RUNTIME(ckc_media);
+
 TD_CFG(ckc_spc,
     TD_MAP(TD_SINGLE_TAP,  TD_KC(KC_SPC)),
     TD_MAP(TD_SINGLE_HOLD, TD_LT(_NUM)),
     TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_SPC))
 );
-TD_RUNTIME(ckc_spc, ckc_spc);
+TD_RUNTIME(ckc_spc);
 
 TD_CFG(ckc_tab,
     TD_MAP(TD_SINGLE_TAP,  TD_KC(KC_TAB)),
     TD_MAP(TD_SINGLE_HOLD, TD_LT(_SYM)),
     TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_TAB))
 );
-TD_RUNTIME(ckc_tab, ckc_tab);
-
-TD_CFG(ckc_bspc,
-    TD_MAP(TD_SINGLE_TAP,  TD_KC_SFT(KC_BSPC, KC_DEL)),
-    TD_MAP(TD_SINGLE_HOLD, TD_LT(_NAV)),
-    TD_MAP(TD_DOUBLE_HOLD, TD_KC_SFT(KC_BSPC, KC_DEL))
-);
-TD_RUNTIME(ckc_bspc, ckc_bspc);
-
-TD_CFG(ckc_media,
-    TD_MAP(TD_DOUBLE_TAP, TD_LT(_MEDIA)),
-    TD_MAP(TD_TRIPLE_TAP, TD_KC(HRM_TOGGLE))
-);
-TD_RUNTIME(ckc_media, ckc_media);
-
-TD_CFG(ckc_game,
-    TD_MAP(TD_DOUBLE_TAP, TD_LT(_GAME1))
-);
-TD_RUNTIME(ckc_game, ckc_game);
-
+TD_RUNTIME(ckc_tab);
 
 // ----------------------------------------------------------------------------
 // Table
 
 USER_TAP_DANCE_TABLE(
     [TDE_CK_BSPC] = TD_ACTION(ckc_bspc),
+    [TDE_CK_EXLM] = TD_ACTION(ckc_exlm),
+    [TDE_CK_GAME] = TD_ACTION(ckc_game),
+    [TDE_CK_GRV] = TD_ACTION(ckc_grv),
+    [TDE_CK_MEDIA] = TD_ACTION(ckc_media),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),
-    [TDE_CK_MEDIA] = TD_ACTION(ckc_media),
-    [TDE_CK_GAME] = TD_ACTION(ckc_game),
 );

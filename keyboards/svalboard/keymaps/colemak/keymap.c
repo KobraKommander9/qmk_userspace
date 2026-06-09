@@ -27,7 +27,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
         /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CKC_MEDIA       , MO(_SYS)          , XXXXXXX           ,
-        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , XXXXXXX           , TO(_GAME1)
+        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , MO(_MBO)          , TO(_GAME1)
         ),
 
     [_GAME1] = LAYOUT(
@@ -60,16 +60,16 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ KC_F5,              KC_F6,              KC_F8,              KC_F7,              KC_F9,              XXXXXXX,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,            _______,            _______,            _______,            _______,            _______,
-        /*LT*/ _______,            XXXXXXX,            _______,            _______,            _______,            _______
+        /*RT*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*LT*/ _______,            XXXXXXX,            _______,            _______,            _______,            XXXXXXX
         ),
 
     [_NAV] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
-        /*R1*/ KC_LEFT,            MKC_DKTP,           KC_END,             KC_LPAD,            KC_HOME,            XXXXXXX,
-        /*R2*/ KC_DOWN,            MKC_APPWIN,         A(KC_RGHT),         MKC_SHDKT,          A(KC_LEFT),         XXXXXXX,
-        /*R3*/ KC_UP,              KC_MCTL,            G(KC_RGHT),         MKC_SHNOT,          G(KC_LEFT),         XXXXXXX,
-        /*R4*/ KC_RIGHT,           MKC_DKTN,           KC_PGDN,            MKC_SPFND,          KC_PGUP,            XXXXXXX,
+        /*R1*/ KC_LEFT,            KC_WREF,            _______,            _______,            _______,            XXXXXXX,
+        /*R2*/ KC_DOWN,            KC_WBAK,            _______,            _______,            _______,            XXXXXXX,
+        /*R3*/ KC_UP,              KC_WFWD,            _______,            _______,            _______,            XXXXXXX,
+        /*R4*/ KC_RIGHT,           _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
         /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
@@ -100,15 +100,15 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_SYM] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
-        /*R1*/ KC_LCBR,            KC_LT,              KC_DLR,             KC_LBRC,            KC_CIRC,            XXXXXXX,
-        /*R2*/ KC_COLN,            KC_EQUAL,           KC_PIPE,            KC_ASTR,            KC_AMPR,            XXXXXXX,
-        /*R3*/ KC_RCBR,            KC_GT,              KC_PERC,            KC_RBRC,            KC_EXLM,            XXXXXXX,
-        /*R4*/ KC_AT,              KC_UNDS,            KC_BSLS,            KC_HASH,            KC_SLSH,            XXXXXXX,
+        /*R1*/ KC_LCBR,            KC_LT,              KC_DLR,             KC_LBRC,            KC_CIRC,            _______,
+        /*R2*/ KC_COLN,            KC_EQUAL,           KC_PIPE,            KC_ASTR,            KC_AMPR,            _______,
+        /*R3*/ KC_RCBR,            KC_GT,              KC_PERC,            KC_RBRC,            KC_EXLM,            _______,
+        /*R4*/ KC_AT,              KC_UNDS,            KC_BSLS,            KC_HASH,            KC_SLSH,            _______,
 
-        /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L1*/ _______,            _______,            _______,            _______,            _______,            _______,
+        /*L2*/ _______,            _______,            _______,            _______,            _______,            _______,
+        /*L3*/ _______,            _______,            _______,            _______,            _______,            _______,
+        /*L4*/ _______,            _______,            _______,            _______,            _______,            _______,
 
         /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,            KC_SPC,             QK_REP,             KC_BSPC,            KC_TAB,             XXXXXXX,
@@ -151,19 +151,19 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_MBO] = LAYOUT(
         /*     Center           North               East                South                West                Double*/
-        /*R1*/ KC_RGUI           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*R2*/ KC_LALT           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*R3*/ KC_RSFT           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*R4*/ KC_RCTL           , _______           , _______           , _______           , _______           , XXXXXXX             ,
+        /*R1*/ KC_BTN3           , _______           , _______           , _______           , _______           , _______             ,
+        /*R2*/ KC_BTN4           , _______           , _______           , _______           , _______           , _______             ,
+        /*R3*/ KC_BTN5           , _______           , _______           , _______           , _______           , _______             ,
+        /*R4*/ _______           , _______           , _______           , _______           , _______           , _______             ,
 
-        /*L1*/ KC_LCTL           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*L2*/ KC_LSFT           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*L3*/ KC_LALT           , _______           , _______           , _______           , _______           , XXXXXXX             ,
-        /*L4*/ KC_LGUI           , _______           , _______           , _______           , _______           , XXXXXXX             ,
+        /*L1*/ _______           , _______           , _______           , _______           , _______           , _______             ,
+        /*L2*/ _______           , _______           , _______           , _______           , _______           , _______             ,
+        /*L3*/ _______           , _______           , _______           , _______           , _______           , _______             ,
+        /*L4*/ _______           , _______           , _______           , _______           , _______           , _______             ,
 
         /*     Down               Pad                Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ KC_BTN2           , KC_BTN1           , KC_BTN2           , _______           , _______           , SV_SNIPER_5         ,
-        /*LT*/ KC_BTN2           , KC_BTN1           , _______           , SV_SNIPER_3       , _______           , SV_SNIPER_3
+        /*LT*/ KC_BTN2           , KC_BTN1           , _______           , SV_SNIPER_3       , _______           , SV_SNIPER_5
         ),
 
     // [_TMP] = LAYOUT(
@@ -192,8 +192,8 @@ void keyboard_post_init_user(void) {
     global_saved_values.left_scroll = true;
     global_saved_values.right_scroll = false;
     global_saved_values.auto_mouse = true;
-    global_saved_values.left_dpi_index = MOUSE_DPI_800;
-    global_saved_values.right_dpi_index = MOUSE_DPI_800;
+    global_saved_values.left_dpi_index = MOUSE_DPI_600;
+    global_saved_values.right_dpi_index = MOUSE_DPI_600;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_hrm_keys();

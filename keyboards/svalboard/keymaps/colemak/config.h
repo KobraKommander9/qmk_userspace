@@ -6,6 +6,7 @@
 
 // Indices into dpi_choices[]: {200,400,600,800,1200,...}
 #define MOUSE_DPI_400   1
+#define MOUSE_DPI_600   2
 #define MOUSE_DPI_800   3
 #define MOUSE_DPI_1200  4
 #define MOUSE_DPI_2400  6
@@ -17,7 +18,7 @@
 #endif
 
 #undef TAPPING_TERM
-#define TAPPING_TERM 230
+#define TAPPING_TERM 200
 
 #ifndef TAPPING_TERM_PER_KEY
 #define TAPPING_TERM_PER_KEY

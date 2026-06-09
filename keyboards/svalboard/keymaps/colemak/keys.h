@@ -3,14 +3,6 @@
 #include "tap_dance.h"
 #include "keymap_support.h"
 
-#define MKC_BKTAB S(KC_TAB)         // Back Tab
-#define MKC_APPWIN C(G(KC_DOWN))    // Show windows from current app
-#define MKC_DKTN C(G(KC_RGHT))      // Next Desktop
-#define MKC_DKTP C(G(KC_LEFT))      // Previous Desktop
-#define MKC_SHDKT A(G(KC_DOWN))     // Show Desktop
-#define MKC_SHNOT A(G(KC_UP))       // Show Notification Center
-#define MKC_SPFND A(G(KC_RIGHT))    // Spotlight Find
-
 #define SV_LDPU SV_LEFT_DPI_INC
 #define SV_LDPD SV_LEFT_DPI_DEC
 #define SV_RDPU SV_RIGHT_DPI_INC
@@ -36,10 +28,12 @@
 #define HRM_O RGUI_T(KC_O)
 
 #define CKC_BSPC USER_TD(TDE_CK_BSPC)
+#define CKC_EXLM USER_TD(TDE_CK_EXLM)
+#define CKC_GAME USER_TD(TDE_CK_GAME)
+#define CKC_GRV USER_TD(TDE_CK_GRV)
+#define CKC_MEDIA USER_TD(TDE_CK_MEDIA)
 #define CKC_SPC USER_TD(TDE_CK_SPC)
 #define CKC_TAB USER_TD(TDE_CK_TAB)
-#define CKC_MEDIA USER_TD(TDE_CK_MEDIA)
-#define CKC_GAME USER_TD(TDE_CK_GAME)
 
 #define RANGE_START QK_KB_20
 enum custom_keycodes {
