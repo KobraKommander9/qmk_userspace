@@ -8,27 +8,45 @@
 #include "eeprom.h"
 #include "svalboard.h"
 
-#include "keys.h"
 #include "hrm.h"
+#include "keys.h"
 #include "layers.h"
+#include "macros.h"
 
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
-        /*     Center            North               East                South             West                Double*/
-        /*R1*/ HRM_N             , KC_L              , KC_MINS           , KC_H            , KC_M              , XXXXXXX           ,
-        /*R2*/ HRM_E             , KC_U              , KC_EQL            , KC_COMMA        , KC_J              , XXXXXXX           ,
-        /*R3*/ HRM_I             , KC_Y              , KC_EXLM           , KC_DOT          , KC_K              , XXXXXXX           ,
-        /*R4*/ HRM_O             , KC_SCLN           , KC_RBRC           , KC_SLASH        , KC_RPRN           , XXXXXXX           ,
+        /*     Center           North               East                South               West                Double*/
+        /*R1*/ KC_N,            KC_L,               KC_MINS,            KC_M,               KC_H,               XXXXXXX,
+        /*R2*/ KC_E,            KC_U,               KC_EQL,             KC_COMMA,           KC_J,               XXXXXXX,
+        /*R3*/ KC_I,            KC_Y,               KC_EXLM,            KC_DOT,             KC_K,               XXXXXXX,
+        /*R4*/ KC_O,            KC_SCLN,            KC_RBRC,            KC_SLSH,            KC_RPRN,            XXXXXXX,
 
-        /*L1*/ HRM_T             , KC_P              , KC_G              , KC_D            , KC_QUOT           , XXXXXXX           ,
-        /*L2*/ HRM_S             , KC_F              , KC_B              , KC_C            , KC_GRV            , XXXXXXX           ,
-        /*L3*/ HRM_R             , KC_W              , KC_V              , KC_X            , KC_BSLS           , XXXXXXX           ,
-        /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
+        /*L1*/ KC_T,            KC_P,               KC_D,               KC_G,               KC_QUOT,            XXXXXXX,
+        /*L2*/ KC_S,            KC_F,               KC_B,               KC_C,               KC_GRV,             XXXXXXX,
+        /*L3*/ KC_R,            KC_W,               KC_V,               KC_X,               KC_BSLS,            XXXXXXX,
+        /*L4*/ KC_A,            KC_Q,               KC_LPRN,            KC_Z,               KC_LBRC,            XXXXXXX,
 
-        /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
-        /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CKC_MEDIA       , MO(_SYS)          , XXXXXXX           ,
-        /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , MO(_MBO)          , TO(_GAME1)
-        ),
+        /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ LT_SYM,          KC_RSFT,            KC_ENT,             MO(_NAV),           KC_LGUI,            XXXXXXX,
+        /*LT*/ LT_NUM,          KC_LSFT,            KC_TAB,             KC_LCTL,            KC_LALT,            XXXXXXX
+    ),
+
+    // [_BASE] = LAYOUT(
+    //     /*     Center            North               East                South             West                Double*/
+    //     /*R1*/ HRM_N             , KC_L              , KC_MINS           , KC_H            , KC_M              , XXXXXXX           ,
+    //     /*R2*/ HRM_E             , KC_U              , KC_EQL            , KC_COMMA        , KC_J              , XXXXXXX           ,
+    //     /*R3*/ HRM_I             , KC_Y              , KC_EXLM           , KC_DOT          , KC_K              , XXXXXXX           ,
+    //     /*R4*/ HRM_O             , KC_SCLN           , KC_RBRC           , KC_SLASH        , KC_RPRN           , XXXXXXX           ,
+    //
+    //     /*L1*/ HRM_T             , KC_P              , KC_G              , KC_D            , KC_QUOT           , XXXXXXX           ,
+    //     /*L2*/ HRM_S             , KC_F              , KC_B              , KC_C            , KC_GRV            , XXXXXXX           ,
+    //     /*L3*/ HRM_R             , KC_W              , KC_V              , KC_X            , KC_BSLS           , XXXXXXX           ,
+    //     /*L4*/ HRM_A             , KC_Q              , KC_LPRN           , KC_Z            , KC_LBRC           , XXXXXXX           ,
+    //
+    //     /*     Down              Pad                 Up                  Nail              Knuckle             DoubleDown*/
+    //     /*RT*/ KC_ENTER          , CKC_SPC           , KC_ESC            , CKC_MEDIA       , MO(_SYS)          , XXXXXXX           ,
+    //     /*LT*/ CKC_TAB           , CKC_BSPC          , CW_TOGG           , CKC_GAME        , MO(_MBO)          , TO(_GAME1)
+    //     ),
 
     [_GAME1] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
@@ -64,56 +82,107 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*LT*/ _______,            XXXXXXX,            _______,            _______,            _______,            XXXXXXX
         ),
 
-    [_NAV] = LAYOUT(
-        /*     Center              North               East                South               West                Double*/
-        /*R1*/ KC_LEFT,            KC_WREF,            _______,            _______,            _______,            XXXXXXX,
-        /*R2*/ KC_DOWN,            KC_WBAK,            _______,            _______,            _______,            XXXXXXX,
-        /*R3*/ KC_UP,              KC_WFWD,            _______,            _______,            _______,            XXXXXXX,
-        /*R4*/ KC_RIGHT,           _______,            _______,            _______,            _______,            XXXXXXX,
-
-        /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-        /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-
-        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_LALT,            KC_TAB,             XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-        /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
-        ),
-
-    [_NUM] = LAYOUT(
-        /*     Center              North               East                South               West                Double*/
-        /*R1*/ KC_F4,              KC_F7,              KC_0,               KC_F1,              _______,            XXXXXXX,
-        /*R2*/ KC_F5,              KC_F8,              _______,            KC_F2,              _______,            XXXXXXX,
-        /*R3*/ KC_F6,              KC_F9,              _______,            KC_F3,              _______,            XXXXXXX,
-        /*R4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
-
-        /*L1*/ KC_6,               KC_9,               KC_0,               KC_3,               KC_PEQL,            XXXXXXX,
-        /*L2*/ KC_5,               KC_8,               XXXXXXX,            KC_2,               KC_PSLS,            XXXXXXX,
-        /*L3*/ KC_4,               KC_7,               XXXXXXX,            KC_1,               KC_PCMM,            XXXXXXX,
-        /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_DOT,             XXXXXXX,
-
-        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,            _______,            KC_LCTL,            KC_LALT,            XXXXXXX,            XXXXXXX,
-        /*LT*/ KC_PENT,            KC_BSPC,            _______,            KC_SPC,             KC_TAB,             XXXXXXX
-        ),
+    // [_SYM] = LAYOUT(
+    //     /*     Center              North               East                South               West                Double*/
+    //     /*R1*/ KC_LCBR,            KC_LT,              KC_DLR,             KC_LBRC,            KC_CIRC,            _______,
+    //     /*R2*/ KC_COLN,            KC_EQUAL,           KC_PIPE,            KC_ASTR,            KC_AMPR,            _______,
+    //     /*R3*/ KC_RCBR,            KC_GT,              KC_PERC,            KC_RBRC,            KC_EXLM,            _______,
+    //     /*R4*/ KC_AT,              KC_UNDS,            KC_BSLS,            KC_HASH,            KC_SLSH,            _______,
+    //
+    //     /*L1*/ _______,            _______,            _______,            _______,            _______,            _______,
+    //     /*L2*/ _______,            _______,            _______,            _______,            _______,            _______,
+    //     /*L3*/ _______,            _______,            _______,            _______,            _______,            _______,
+    //     /*L4*/ _______,            _______,            _______,            _______,            _______,            _______,
+    //
+    //     /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+    //     /*RT*/ _______,            KC_SPC,             QK_REP,             KC_BSPC,            KC_TAB,             XXXXXXX,
+    //     /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+    //     ),
 
     [_SYM] = LAYOUT(
-        /*     Center              North               East                South               West                Double*/
-        /*R1*/ KC_LCBR,            KC_LT,              KC_DLR,             KC_LBRC,            KC_CIRC,            _______,
-        /*R2*/ KC_COLN,            KC_EQUAL,           KC_PIPE,            KC_ASTR,            KC_AMPR,            _______,
-        /*R3*/ KC_RCBR,            KC_GT,              KC_PERC,            KC_RBRC,            KC_EXLM,            _______,
-        /*R4*/ KC_AT,              KC_UNDS,            KC_BSLS,            KC_HASH,            KC_SLSH,            _______,
+        /*     Center           North               East                South               West                Double*/
+        /*R1*/ KC_RPRN,         KC_RCBR,            KC_QUES,            KC_RBRC,            KC_GT,              XXXXXXX,
+        /*R2*/ KC_COLN,         KC_SCLN,            KC_AT,              KC_DOT,             KC_COMM,            XXXXXXX,
+        /*R3*/ KC_UNDS,         KC_DLR,             KC_TILD,            KC_HASH,            KC_PERC,            XXXXXXX,
+        /*R4*/ M_ARR,           M_FAT,              _______,            M_SCP,              M_WAL,              XXXXXXX,
 
-        /*L1*/ _______,            _______,            _______,            _______,            _______,            _______,
-        /*L2*/ _______,            _______,            _______,            _______,            _______,            _______,
-        /*L3*/ _______,            _______,            _______,            _______,            _______,            _______,
-        /*L4*/ _______,            _______,            _______,            _______,            _______,            _______,
+        /*L1*/ KC_LPRN,         KC_LCBR,            KC_LT,              KC_LBRC,            KC_EXLM,            XXXXXXX,
+        /*L2*/ KC_DQUO,         KC_ASTR,            KC_PIPE,            KC_AMPR,            KC_CIRC,            XXXXXXX,
+        /*L3*/ KC_EQL,          KC_PLUS,            KC_SLSH,            KC_MINS,            KC_BSLS,            XXXXXXX,
+        /*L4*/ KC_GRV,          M_AND,              _______,            M_OR,               _______,            XXXXXXX,
 
-        /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,            KC_SPC,             QK_REP,             KC_BSPC,            KC_TAB,             XXXXXXX,
-        /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
-        ),
+        /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ _______,         _______,            _______,            _______,            _______,            QK_LLCK,
+        /*LT*/ _______,         _______,            _______,            _______,            _______,            _______
+    ),
+
+    // [_NUM] = LAYOUT(
+    //     /*     Center              North               East                South               West                Double*/
+    //     /*R1*/ KC_F4,              KC_F7,              KC_0,               KC_F1,              _______,            XXXXXXX,
+    //     /*R2*/ KC_F5,              KC_F8,              _______,            KC_F2,              _______,            XXXXXXX,
+    //     /*R3*/ KC_F6,              KC_F9,              _______,            KC_F3,              _______,            XXXXXXX,
+    //     /*R4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+    //
+    //     /*L1*/ KC_6,               KC_9,               KC_0,               KC_3,               KC_PEQL,            XXXXXXX,
+    //     /*L2*/ KC_5,               KC_8,               XXXXXXX,            KC_2,               KC_PSLS,            XXXXXXX,
+    //     /*L3*/ KC_4,               KC_7,               XXXXXXX,            KC_1,               KC_PCMM,            XXXXXXX,
+    //     /*L4*/ KC_PENT,            KC_PPLS,            KC_PAST,            KC_PMNS,            KC_DOT,             XXXXXXX,
+    //
+    //     /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+    //     /*RT*/ _______,            _______,            KC_LCTL,            KC_LALT,            XXXXXXX,            XXXXXXX,
+    //     /*LT*/ KC_PENT,            KC_BSPC,            _______,            KC_SPC,             KC_TAB,             XXXXXXX
+    //     ),
+
+    [_NUM] = LAYOUT(
+        /*     Center           North               East                South               West                Double*/
+        /*R1*/ KC_4,            KC_7,               KC_MINS,            KC_1,               KC_0,               XXXXXXX,
+        /*R2*/ KC_5,            KC_8,               KC_SLSH,            KC_2,               KC_DOT,             XXXXXXX,
+        /*R3*/ KC_6,            KC_9,               KC_PLUS,            KC_3,               KC_COMM,            XXXXXXX,
+        /*R4*/ KC_0,            _______,            KC_EQL,             KC_DOT,             _______,            XXXXXXX,
+
+        /*L1*/ KC_F8,           KC_F4,              _______,            KC_F12,             _______,            XXXXXXX,
+        /*L2*/ KC_F7,           KC_F3,              _______,            KC_F11,             _______,            XXXXXXX,
+        /*L3*/ KC_F6,           KC_F2,              _______,            KC_F10,             _______,            XXXXXXX,
+        /*L4*/ KC_F5,           KC_F1,              _______,            KC_F9,              _______,            XXXXXXX,
+
+        /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*LT*/ _______,         _______,            _______,            _______,            _______,            QK_LLCK
+    ),
+
+    // [_NAV] = LAYOUT(
+    //     /*     Center              North               East                South               West                Double*/
+    //     /*R1*/ KC_LEFT,            KC_WREF,            _______,            _______,            _______,            XXXXXXX,
+    //     /*R2*/ KC_DOWN,            KC_WBAK,            _______,            _______,            _______,            XXXXXXX,
+    //     /*R3*/ KC_UP,              KC_WFWD,            _______,            _______,            _______,            XXXXXXX,
+    //     /*R4*/ KC_RIGHT,           _______,            _______,            _______,            _______,            XXXXXXX,
+    //
+    //     /*L1*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+    //     /*L2*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+    //     /*L3*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+    //     /*L4*/ _______,            _______,            _______,            _______,            _______,            XXXXXXX,
+    //
+    //     /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
+    //     /*RT*/ KC_LALT,            KC_TAB,             XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+    //     ),
+
+    [_NAV] = LAYOUT(
+        /*     Center           North               East                South               West                Double*/
+        /*R1*/ KC_DOWN,         KC_HOME,            _______,            LGUI(KC_X),         KC_LEFT,            XXXXXXX,
+        /*R2*/ KC_UP,           KC_PGDN,            _______,            LGUI(KC_C),         _______,            XXXXXXX,
+        /*R3*/ KC_RIGHT,        KC_PGUP,            _______,            LGUI(KC_V),         _______,            XXXXXXX,
+        /*R4*/ KC_DEL,          KC_END,             _______,            _______,            _______,            XXXXXXX,
+
+        /*L1*/ KC_LCTL,         KC_WREF,            _______,            LCTL(KC_V),         _______,            XXXXXXX,
+        /*L2*/ KC_LSFT,         KC_WBAK,            _______,            LCTL(KC_C),         _______,            XXXXXXX,
+        /*L3*/ KC_LALT,         KC_WFWD,            _______,            LCTL(KC_X),         _______,            XXXXXXX,
+        /*L4*/ KC_LGUI,         KC_ESC,             _______,            _______,            _______,            XXXXXXX,
+
+        /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
+        /*RT*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*LT*/ _______,         _______,            _______,            _______,            _______,            _______
+    ),
 
     [_MEDIA] = LAYOUT(
         /*     Center              North               East                South               West                Double*/
@@ -167,21 +236,21 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         ),
 
     // [_TMP] = LAYOUT(
-    //     /*     Center              North               East                South               West                Double*/
-    //     /*R1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*R2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*R3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*R4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*     Center           North               East                South               West                Double*/
+    //     /*R1*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R2*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R3*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*R4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
     //
-    //     /*L1*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*L2*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*L3*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*L4*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L1*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L2*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L3*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*L4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
     //
-    //     /*     Down                Pad                 Up                  Nail                Knuckle             DoubleDown*/
-    //     /*RT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
-    //     /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
-    //     ),
+    //     /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
+    //     /*RT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+    //     /*LT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
+    // ),
 };
 
 void eeconfig_init_user(void) {
@@ -202,6 +271,7 @@ void keyboard_post_init_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
+    if (!process_macro(keycode, record)) return false;
 
     return true;
 }

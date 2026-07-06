@@ -27,6 +27,9 @@
 #define HRM_I LALT_T(KC_I)
 #define HRM_O RGUI_T(KC_O)
 
+#define LT_SYM LT(_SYM,KC_SPC)
+#define LT_NUM LT(_NUM,KC_BSPC)
+
 #define CKC_BSPC USER_TD(TDE_CK_BSPC)
 #define CKC_EXLM USER_TD(TDE_CK_EXLM)
 #define CKC_GAME USER_TD(TDE_CK_GAME)
@@ -40,6 +43,14 @@ enum custom_keycodes {
     // Home Row Mods
     HRM_TOGGLE = RANGE_START,
     HRM_CYCLE,
+
+    // Macros
+    M_ARR,
+    M_FAT,
+    M_SCP,
+    M_WAL,
+    M_AND,
+    M_OR,
 };
 
 extern void mouse_mode(bool on);
