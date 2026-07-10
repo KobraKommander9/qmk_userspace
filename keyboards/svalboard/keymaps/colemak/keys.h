@@ -27,8 +27,8 @@
 #define HRM_I LALT_T(KC_I)
 #define HRM_O RGUI_T(KC_O)
 
-#define LT_SYM LT(_SYM,KC_SPC)
-#define LT_NUM LT(_NUM,KC_BSPC)
+#define LT_SPC LT(_SYM,KC_SPC)
+#define LT_BSPC LT(_NUM,KC_BSPC)
 
 #define CKC_BSPC USER_TD(TDE_CK_BSPC)
 #define CKC_EXLM USER_TD(TDE_CK_EXLM)
