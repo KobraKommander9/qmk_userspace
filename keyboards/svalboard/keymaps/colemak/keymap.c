@@ -16,19 +16,19 @@
 const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ KC_N,            KC_L,               KC_MINS,            KC_M,               KC_H,               XXXXXXX,
-        /*R2*/ KC_E,            KC_U,               KC_EQL,             KC_COMMA,           KC_J,               XXXXXXX,
-        /*R3*/ KC_I,            KC_Y,               KC_EXLM,            KC_DOT,             KC_K,               XXXXXXX,
-        /*R4*/ KC_O,            KC_SCLN,            KC_RBRC,            KC_SLSH,            KC_RPRN,            XXXXXXX,
+        /*R1*/ HRM_N,           KC_L,               KC_MINS,            KC_M,               KC_H,               XXXXXXX,
+        /*R2*/ HRM_E,           KC_U,               KC_EQL,             KC_COMMA,           KC_J,               XXXXXXX,
+        /*R3*/ HRM_I,           KC_Y,               KC_EXLM,            KC_DOT,             KC_K,               XXXXXXX,
+        /*R4*/ HRM_O,           KC_SCLN,            KC_RBRC,            KC_SLSH,            KC_RPRN,            XXXXXXX,
 
-        /*L1*/ KC_T,            KC_P,               KC_D,               KC_G,               KC_QUOT,            XXXXXXX,
-        /*L2*/ KC_S,            KC_F,               KC_B,               KC_C,               KC_GRV,             XXXXXXX,
-        /*L3*/ KC_R,            KC_W,               KC_V,               KC_X,               KC_BSLS,            XXXXXXX,
-        /*L4*/ KC_A,            KC_Q,               KC_LPRN,            KC_Z,               KC_LBRC,            XXXXXXX,
+        /*L1*/ HRM_T,           KC_P,               KC_G,               KC_D,               KC_QUOT,            XXXXXXX,
+        /*L2*/ HRM_S,           KC_F,               KC_B,               KC_C,               KC_GRV,             XXXXXXX,
+        /*L3*/ HRM_R,           KC_W,               KC_V,               KC_X,               KC_BSLS,            XXXXXXX,
+        /*L4*/ HRM_A,           KC_Q,               KC_LPRN,            KC_Z,               KC_LBRC,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ LT_SPC,          KC_RSFT,            KC_ENT,             MO(_NAV),           KC_LGUI,            XXXXXXX,
-        /*LT*/ LT_BSPC,         KC_LSFT,            KC_TAB,             CKC_MEH,            CKC_HYPR,           XXXXXXX
+        /*RT*/ LT_ENT,          KC_SPC,             KC_ESC,             MO(_NAV),           KC_HYPR,            XXXXXXX,
+        /*LT*/ LT_TAB,          KC_BSPC,            CW_TOGG,            XXXXXXX,            KC_MEH,             XXXXXXX
     ),
 
     // [_BASE] = LAYOUT(
@@ -99,22 +99,24 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
     //     /*LT*/ XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
     //     ),
 
+
     [_SYM] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ KC_RPRN,         KC_RCBR,            KC_QUES,            KC_RBRC,            KC_GT,              XXXXXXX,
-        /*R2*/ KC_COLN,         KC_SCLN,            KC_AT,              KC_DOT,             KC_COMM,            XXXXXXX,
-        /*R3*/ KC_UNDS,         KC_DLR,             KC_TILD,            KC_HASH,            KC_PERC,            XXXXXXX,
-        /*R4*/ M_ARR,           M_FAT,              _______,            M_SCP,              M_WAL,              XXXXXXX,
+        /*R1*/ M_AND,           KC_PERC,            KC_DLR,             M_ARR,              KC_CIRC,            XXXXXXX,
+        /*R2*/ M_OR,            KC_HASH,            KC_PIPE,            M_FAT,              KC_AMPR,            XXXXXXX,
+        /*R3*/ M_WAL,           KC_BSLS,            XXXXXXX,            M_SCP,              XXXXXXX,            XXXXXXX,
+        /*R4*/ KC_AT,           XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
-        /*L1*/ KC_LPRN,         KC_LCBR,            KC_LT,              KC_LBRC,            KC_EXLM,            XXXXXXX,
-        /*L2*/ KC_DQUO,         KC_ASTR,            KC_PIPE,            KC_AMPR,            KC_CIRC,            XXXXXXX,
-        /*L3*/ KC_EQL,          KC_PLUS,            KC_SLSH,            KC_MINS,            KC_BSLS,            XXXXXXX,
-        /*L4*/ KC_GRV,          M_AND,              _______,            M_OR,               _______,            XXXXXXX,
+        /*L1*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L2*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L3*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
+        /*L4*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         _______,            _______,            _______,            _______,            QK_LLCK,
         /*LT*/ _______,         _______,            _______,            _______,            _______,            _______
     ),
+
 
     // [_NUM] = LAYOUT(
     //     /*     Center              North               East                South               West                Double*/
@@ -135,15 +137,15 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_NUM] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ KC_4,            KC_7,               KC_MINS,            KC_1,               KC_0,               XXXXXXX,
-        /*R2*/ KC_5,            KC_8,               KC_SLSH,            KC_2,               KC_DOT,             XXXXXXX,
-        /*R3*/ KC_6,            KC_9,               KC_PLUS,            KC_3,               KC_COMM,            XXXXXXX,
-        /*R4*/ KC_0,            _______,            KC_EQL,             KC_DOT,             _______,            XXXXXXX,
+        /*R1*/ KC_F5,           KC_F1,              XXXXXXX,            KC_F9,              XXXXXXX,            XXXXXXX,
+        /*R2*/ KC_F6,           KC_F2,              XXXXXXX,            KC_F10,             XXXXXXX,            XXXXXXX,
+        /*R3*/ KC_F7,           KC_F3,              XXXXXXX,            KC_F11,             XXXXXXX,            XXXXXXX,
+        /*R4*/ KC_F8,           KC_F4,              XXXXXXX,            KC_F12,             XXXXXXX,            XXXXXXX,
 
-        /*L1*/ KC_F8,           KC_F4,              _______,            KC_F12,             _______,            XXXXXXX,
-        /*L2*/ KC_F7,           KC_F3,              _______,            KC_F11,             _______,            XXXXXXX,
-        /*L3*/ KC_F6,           KC_F2,              _______,            KC_F10,             _______,            XXXXXXX,
-        /*L4*/ KC_F5,           KC_F1,              _______,            KC_F9,              _______,            XXXXXXX,
+        /*L1*/ KC_6,            KC_9,               KC_0,               KC_3,               XXXXXXX,            XXXXXXX,
+        /*L2*/ KC_5,            KC_8,               XXXXXXX,            KC_2,               XXXXXXX,            XXXXXXX,
+        /*L3*/ KC_4,            KC_7,               XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
+        /*L4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         _______,            _______,            _______,            _______,            _______,
@@ -262,7 +264,7 @@ void keyboard_post_init_user(void) {
     global_saved_values.right_scroll = false;
     global_saved_values.auto_mouse = true;
     global_saved_values.left_dpi_index = MOUSE_DPI_600;
-    global_saved_values.right_dpi_index = MOUSE_DPI_600;
+    global_saved_values.right_dpi_index = MOUSE_DPI_1200;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_hrm_keys();
