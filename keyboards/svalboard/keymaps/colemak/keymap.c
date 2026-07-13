@@ -28,7 +28,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ LT_SPC,          KC_RSFT,            KC_ENT,             MO(_NAV),           KC_LGUI,            XXXXXXX,
-        /*LT*/ LT_BSPC,         KC_LSFT,            KC_TAB,             KC_LCTL,            KC_LALT,            XXXXXXX
+        /*LT*/ LT_BSPC,         KC_LSFT,            KC_TAB,             CKC_MEH,            CKC_HYPR,           XXXXXXX
     ),
 
     // [_BASE] = LAYOUT(

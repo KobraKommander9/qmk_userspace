@@ -502,11 +502,25 @@ TD_CFG(ckc_grv,
 );
 TD_RUNTIME(ckc_grv);
 
+TD_CFG(ckc_hypr,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_LALT)),
+    TD_MAP(TD_DOUBLE_TAP, TD_KC(KC_HYPR)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_HYPR))
+);
+TD_RUNTIME(ckc_hypr);
+
 TD_CFG(ckc_media,
     TD_MAP(TD_DOUBLE_TAP, TD_LT(_MEDIA)),
     TD_MAP(TD_TRIPLE_TAP, TD_KC(HRM_TOGGLE))
 );
 TD_RUNTIME(ckc_media);
+
+TD_CFG(ckc_meh,
+    TD_MAP(TD_SINGLE_TAP, TD_KC(KC_LCTL)),
+    TD_MAP(TD_DOUBLE_TAP, TD_KC(KC_MEH)),
+    TD_MAP(TD_DOUBLE_HOLD, TD_KC(KC_MEH))
+);
+TD_RUNTIME(ckc_meh);
 
 TD_CFG(ckc_spc,
     TD_MAP(TD_SINGLE_TAP,  TD_KC(KC_SPC)),
@@ -530,7 +544,9 @@ USER_TAP_DANCE_TABLE(
     [TDE_CK_EXLM] = TD_ACTION(ckc_exlm),
     [TDE_CK_GAME] = TD_ACTION(ckc_game),
     [TDE_CK_GRV] = TD_ACTION(ckc_grv),
+    [TDE_CK_HYPR] = TD_ACTION(ckc_hypr),
     [TDE_CK_MEDIA] = TD_ACTION(ckc_media),
+    [TDE_CK_MEH] = TD_ACTION(ckc_meh),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),
 );
