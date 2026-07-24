@@ -102,10 +102,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_SYM] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ M_AND,           KC_PERC,            KC_DLR,             M_ARR,              KC_CIRC,            XXXXXXX,
+        /*R1*/ M_AND,           KC_ASTR,            KC_DLR,             M_ARR,              KC_CIRC,            XXXXXXX,
         /*R2*/ M_OR,            KC_HASH,            KC_PIPE,            M_FAT,              KC_AMPR,            XXXXXXX,
         /*R3*/ M_WAL,           KC_BSLS,            XXXXXXX,            M_SCP,              XXXXXXX,            XXXXXXX,
-        /*R4*/ KC_AT,           XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*R4*/ KC_AT,           KC_PERC,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*L1*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
         /*L2*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
@@ -171,10 +171,10 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_NAV] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ KC_DOWN,         KC_HOME,            _______,            LGUI(KC_X),         KC_LEFT,            XXXXXXX,
+        /*R1*/ KC_DOWN,         KC_HOME,            _______,            KC_LEFT,            _______,            XXXXXXX,
         /*R2*/ KC_UP,           KC_PGDN,            _______,            LGUI(KC_C),         _______,            XXXXXXX,
         /*R3*/ KC_RIGHT,        KC_PGUP,            _______,            LGUI(KC_V),         _______,            XXXXXXX,
-        /*R4*/ KC_DEL,          KC_END,             _______,            _______,            _______,            XXXXXXX,
+        /*R4*/ KC_DEL,          KC_END,             _______,            LGUI(KC_X),         _______,            XXXXXXX,
 
         /*L1*/ KC_LCTL,         KC_WREF,            _______,            LCTL(KC_V),         _______,            XXXXXXX,
         /*L2*/ KC_LSFT,         KC_WBAK,            _______,            LCTL(KC_C),         _______,            XXXXXXX,
