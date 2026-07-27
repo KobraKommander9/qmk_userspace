@@ -35,7 +35,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Center           North               East                South               West                Double*/
         /*R1*/ KC_LEFT,         XXXXXXX,            XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
         /*R2*/ KC_DOWN,         KC_UP,              XXXXXXX,            KC_2,               XXXXXXX,            XXXXXXX,
-        /*R3*/ KC_RIGHT         XXXXXXX,            XXXXXXX,            KC_3,               XXXXXXX,            XXXXXXX,
+        /*R3*/ KC_RIGHT,        XXXXXXX,            XXXXXXX,            KC_3,               XXXXXXX,            XXXXXXX,
         /*R4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            KC_4,               XXXXXXX,            XXXXXXX,
 
         /*L1*/ KC_D,            KC_E,               KC_V,               KC_F,               KC_G,               XXXXXXX,
@@ -46,7 +46,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ KC_LCTL,         KC_BTN1,            KC_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
         /*LT*/ KC_BTN2,         KC_SPC,             KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
-        ),
+    ),
 
     [_GAME2] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
@@ -63,7 +63,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
         /*LT*/ _______,         XXXXXXX,            _______,            _______,            _______,            XXXXXXX
-        ),
+    ),
 
     [_SYM] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
@@ -132,7 +132,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
         /*LT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
-        ),
+    ),
 
     [_SYS] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
@@ -149,7 +149,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
         /*LT*/ SV_SOUT,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
-        ),
+    ),
 
     [_MBO] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
@@ -166,7 +166,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         KC_BTN1,            KC_BTN2,            _______,            SV_SNIPER_3,        _______,
         /*LT*/ _______,         KC_BTN1,            KC_BTN2,            _______,            SV_SNIPER_3,        _______
-        ),
+    ),
 
     // [_TMP] = LAYOUT(
     //     /*     Center           North               East                South               West                Double*/
@@ -194,7 +194,7 @@ void keyboard_post_init_user(void) {
     global_saved_values.left_scroll = true;
     global_saved_values.right_scroll = false;
     global_saved_values.auto_mouse = true;
-    global_saved_values.left_dpi_index = MOUSE_DPI_400;
+    global_saved_values.left_dpi_index = MOUSE_DPI_800;
     global_saved_values.right_dpi_index = MOUSE_DPI_400;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
