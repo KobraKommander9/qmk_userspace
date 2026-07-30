@@ -165,7 +165,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         KC_BTN1,            KC_BTN2,            _______,            SV_SNIPER_3,        _______,
-        /*LT*/ _______,         KC_BTN1,            KC_BTN2,            _______,            SV_SNIPER_3,        _______
+        /*LT*/ KC_BTN1,         _______,            KC_BTN2,            _______,            SV_SNIPER_3,        _______
     ),
 
     // [_TMP] = LAYOUT(
