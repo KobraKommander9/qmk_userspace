@@ -67,9 +67,9 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_SYM] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ M_AND,           KC_ASTR,            KC_DLR,             M_ARR,              KC_CIRC,            XXXXXXX,
-        /*R2*/ M_OR,            KC_HASH,            KC_AMPR,            M_FAT,              KC_PIPE,            XXXXXXX,
-        /*R3*/ M_WAL,           KC_BSLS,            XXXXXXX,            M_SCP,              XXXXXXX,            XXXXXXX,
+        /*R1*/ M_WAL,           KC_ASTR,            KC_DLR,             M_ARR,              KC_CIRC,            XXXXXXX,
+        /*R2*/ M_AND,           KC_HASH,            KC_AMPR,            M_FAT,              KC_PIPE,            XXXXXXX,
+        /*R3*/ M_OR,            KC_BSLS,            XXXXXXX,            M_SCP,              XXXXXXX,            XXXXXXX,
         /*R4*/ KC_AT,           KC_PERC,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*L1*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
