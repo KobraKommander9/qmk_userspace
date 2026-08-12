@@ -25,11 +25,11 @@ uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case HRM_A:
         case HRM_O:
-            return TAPPING_TERM + 35;
+            return TAPPING_TERM + 30;
 
         case HRM_R:
         case HRM_I:
-            return TAPPING_TERM + 30;
+            return TAPPING_TERM + 25;
 
         case HRM_S:
         case HRM_E:
