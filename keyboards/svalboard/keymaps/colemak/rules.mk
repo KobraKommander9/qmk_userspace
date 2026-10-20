@@ -3,8 +3,6 @@ LAYER_LOCK_ENABLE = yes
 TAP_DANCE_ENABLE = yes
 
 VIA_ENABLE = yes
-VIAL_ENABLE = yes
-VIAL_INSECURE ?= yes
 
 VPATH += keyboards/svalboard/keymaps
 SRC += keymap_support.c

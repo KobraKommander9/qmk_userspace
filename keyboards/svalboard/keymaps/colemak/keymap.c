@@ -44,8 +44,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ KC_LSFT,         KC_TAB,             KC_LALT,            KC_LCTL,            KC_CAPS,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_LCTL,         KC_BTN1,            KC_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ KC_BTN2,         KC_SPC,             KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
+        /*RT*/ KC_LCTL,         MS_BTN1,            MS_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
+        /*LT*/ MS_BTN2,         KC_SPC,             KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
     ),
 
     [_GAME2] = LAYOUT(
@@ -164,8 +164,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ _______,         _______,            _______,            _______,            _______,            _______,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,         KC_BTN1,            KC_BTN2,            KC_BTN3,            SV_SNIPER_3,        _______,
-        /*LT*/ KC_BTN1,         KC_BTN4,            KC_BTN2,            KC_BTN3,            SV_SNIPER_3,        _______
+        /*RT*/ _______,         MS_BTN1,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______,
+        /*LT*/ MS_BTN1,         MS_BTN4,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______
     ),
 
     // [_TMP] = LAYOUT(

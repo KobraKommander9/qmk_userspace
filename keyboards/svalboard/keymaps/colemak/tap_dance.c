@@ -539,7 +539,7 @@ TD_RUNTIME(ckc_tab);
 // ----------------------------------------------------------------------------
 // Table
 
-USER_TAP_DANCE_TABLE(
+tap_dance_action_t tap_dance_actions[] = {
     [TDE_CK_BSPC] = TD_ACTION(ckc_bspc),
     [TDE_CK_EXLM] = TD_ACTION(ckc_exlm),
     [TDE_CK_GAME] = TD_ACTION(ckc_game),
@@ -549,4 +549,4 @@ USER_TAP_DANCE_TABLE(
     [TDE_CK_MEH] = TD_ACTION(ckc_meh),
     [TDE_CK_SPC] = TD_ACTION(ckc_spc),
     [TDE_CK_TAB] = TD_ACTION(ckc_tab),
-);
+};
