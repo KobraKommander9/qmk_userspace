@@ -492,7 +492,7 @@ TD_RUNTIME(ckc_exlm);
 
 TD_CFG(ckc_game,
     TD_MAP(TD_SINGLE_TAP, TD_KC(KC_TAB)),
-    TD_MAP(TD_DOUBLE_TAP, TD_LT(_GAME1))
+    TD_MAP(TD_DOUBLE_TAP, TD_LMV(_GAME1))
 );
 TD_RUNTIME(ckc_game);
 

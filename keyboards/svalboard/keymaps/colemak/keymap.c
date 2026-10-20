@@ -28,7 +28,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ LT_ENT,          KC_SPC,             KC_ESC,             MO(_NAV),           KC_HYPR,            XXXXXXX,
-        /*LT*/ LT_TAB,          KC_BSPC,            CW_TOGG,            XXXXXXX,            KC_MEH,             XXXXXXX
+        /*LT*/ LT_TAB,          KC_BSPC,            CW_TOGG,            CKC_GAME,           KC_MEH,             XXXXXXX
     ),
 
     [_GAME1] = LAYOUT(
@@ -41,11 +41,11 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L1*/ KC_D,            KC_E,               KC_V,               KC_F,               KC_G,               XXXXXXX,
         /*L2*/ KC_W,            KC_C,               KC_R,               KC_S,               KC_H,               XXXXXXX,
         /*L3*/ KC_A,            KC_Q,               KC_X,               KC_Z,               KC_B,               XXXXXXX,
-        /*L4*/ KC_LSFT,         KC_TAB,             KC_LALT,            KC_LCTL,            KC_CAPS,            XXXXXXX,
+        /*L4*/ KC_SPC,          KC_TAB,             MS_BTN2,            KC_LCTL,            KC_LSFT,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_LCTL,         MS_BTN1,            MS_BTN2,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ MS_BTN2,         KC_SPC,             KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
+        /*RT*/ KC_LCTL,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
+        /*LT*/ MS_BTN1,         XXXXXXX,            KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
     ),
 
     [_GAME2] = LAYOUT(
@@ -57,7 +57,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*L1*/ KC_6,            KC_9,               KC_0,               KC_3,               XXXXXXX,            XXXXXXX,
         /*L2*/ KC_5,            KC_8,               XXXXXXX,            KC_2,               XXXXXXX,            XXXXXXX,
-        /*L3*/ KC_4,            KC_7,               XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
+        /*L3*/ KC_4,            KC_7,               KC_LALT,            KC_1,               XXXXXXX,            XXXXXXX,
         /*L4*/ KC_F5,           KC_F6,              KC_F8,              KC_F7,              KC_F9,              XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
@@ -164,7 +164,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ _______,         _______,            _______,            _______,            _______,            _______,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,         MS_BTN1,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______,
+        /*RT*/ MS_BTN1,         _______,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______,
         /*LT*/ MS_BTN1,         MS_BTN4,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______
     ),
 
@@ -210,11 +210,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    if (layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2)) {
+    static bool gaming = false;
+    bool game_layer = layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2);
+
+    if (game_layer) {
         global_saved_values.auto_mouse = false;
         mouse_mode(false);
     } else {
         global_saved_values.auto_mouse = true;
+    }
+
+    // set_right_dpi doesn't persist, so leaving restores the saved DPI.
+    if (game_layer != gaming) {
+        gaming = game_layer;
+        if (gaming) {
+            set_right_dpi(MOUSE_DPI_1200);
+        } else {
+            set_dpi_from_eeprom();
+        }
     }
 
     return state;
