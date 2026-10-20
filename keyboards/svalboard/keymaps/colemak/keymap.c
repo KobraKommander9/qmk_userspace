@@ -194,8 +194,8 @@ void keyboard_post_init_user(void) {
     global_saved_values.left_scroll = true;
     global_saved_values.right_scroll = false;
     global_saved_values.auto_mouse = true;
-    global_saved_values.left_dpi_index = MOUSE_DPI_800;
-    global_saved_values.right_dpi_index = MOUSE_DPI_400;
+    global_saved_values.left_dpi_index = MOUSE_DPI_400;
+    global_saved_values.right_dpi_index = MOUSE_DPI_600;
     global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
     setup_hrm_keys();
@@ -224,7 +224,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     if (game_layer != gaming) {
         gaming = game_layer;
         if (gaming) {
-            set_right_dpi(MOUSE_DPI_1200);
+            set_right_dpi(MOUSE_DPI_800);
         } else {
             set_dpi_from_eeprom();
         }
