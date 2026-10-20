@@ -186,17 +186,27 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
     // ),
 };
 
+// The kb resets its saved values after eeconfig_init_user runs, so ours are
+// applied in keyboard_post_init_user instead.
+static bool apply_sval_defaults = false;
+
 void eeconfig_init_user(void) {
     init_hrm_eeprom();
+    apply_sval_defaults = true;
 }
 
 void keyboard_post_init_user(void) {
-    global_saved_values.left_scroll = true;
-    global_saved_values.right_scroll = false;
-    global_saved_values.auto_mouse = true;
-    global_saved_values.left_dpi_index = MOUSE_DPI_400;
-    global_saved_values.right_dpi_index = MOUSE_DPI_600;
-    global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
+    if (apply_sval_defaults) {
+        global_saved_values.left_scroll = true;
+        global_saved_values.right_scroll = false;
+        global_saved_values.auto_mouse = true;
+        global_saved_values.left_dpi_index = MOUSE_DPI_200;
+        global_saved_values.right_dpi_index = MOUSE_DPI_600;
+        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
+
+        write_eeprom_kb();
+        set_dpi_from_eeprom();
+    }
 
     setup_hrm_keys();
     setup_rgb_colors();
@@ -211,21 +221,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     static bool gaming = false;
+    static bool saved_auto_mouse;
     bool game_layer = layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2);
-
-    if (game_layer) {
-        global_saved_values.auto_mouse = false;
-        mouse_mode(false);
-    } else {
-        global_saved_values.auto_mouse = true;
-    }
 
     // set_right_dpi doesn't persist, so leaving restores the saved DPI.
     if (game_layer != gaming) {
         gaming = game_layer;
         if (gaming) {
+            saved_auto_mouse = global_saved_values.auto_mouse;
+            // mouse_mode is a no-op once auto_mouse is off, and its nested
+            // layer_off is overwritten by the state returned here.
+            mouse_mode(false);
+            state &= ~((layer_state_t)1 << MH_AUTO_BUTTONS_LAYER);
+            global_saved_values.auto_mouse = false;
             set_right_dpi(MOUSE_DPI_800);
         } else {
+            global_saved_values.auto_mouse = saved_auto_mouse;
+            // Any kb EEPROM write while gaming persisted auto_mouse = false.
+            write_eeprom_kb();
             set_dpi_from_eeprom();
         }
     }
