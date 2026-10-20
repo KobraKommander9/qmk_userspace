@@ -201,8 +201,8 @@ void keyboard_post_init_user(void) {
         global_saved_values.right_scroll = false;
         global_saved_values.auto_mouse = true;
         global_saved_values.left_dpi_index = MOUSE_DPI_200;
-        global_saved_values.right_dpi_index = MOUSE_DPI_600;
-        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
+        global_saved_values.right_dpi_index = MOUSE_DPI_800;
+        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_200;
 
         write_eeprom_kb();
         set_dpi_from_eeprom();
