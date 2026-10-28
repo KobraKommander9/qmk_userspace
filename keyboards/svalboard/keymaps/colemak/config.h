@@ -10,6 +10,7 @@
 
 // Index into mh_timer_choices[]: {200,300,400,500,800,-1}; -1 = no timeout
 #define MOUSE_LAYER_TIMEOUT_200 0
+#define MOUSE_LAYER_TIMEOUT_400 2
 #define MOUSE_LAYER_TIMEOUT_NONE 5
 
 #ifndef CAPS_WORD_ENABLE

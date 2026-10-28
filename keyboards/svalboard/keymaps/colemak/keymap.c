@@ -153,19 +153,19 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_MBO] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*R2*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*R3*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*R4*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*R1*/ MS_BTN1,         _______,            _______,            _______,            _______,            _______,
+        /*R2*/ MS_BTN2,         _______,            _______,            _______,            _______,            _______,
+        /*R3*/ MS_BTN3,         _______,            _______,            _______,            _______,            _______,
+        /*R4*/ MS_BTN4,         _______,            _______,            _______,            _______,            _______,
 
-        /*L1*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*L2*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*L3*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*L4*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*L1*/ MS_BTN1,         _______,            _______,            _______,            _______,            _______,
+        /*L2*/ MS_BTN2,         _______,            _______,            _______,            _______,            _______,
+        /*L3*/ MS_BTN3,         _______,            _______,            _______,            _______,            _______,
+        /*L4*/ MS_BTN4,         _______,            _______,            _______,            _______,            _______,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ MS_BTN1,         _______,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______,
-        /*LT*/ MS_BTN1,         MS_BTN4,            MS_BTN2,            MS_BTN3,            SV_SNIPER_3,        _______
+        /*RT*/ _______,         _______,            _______,            _______,            SV_SNIPER_3,        _______,
+        /*LT*/ _______,         _______,            _______,            _______,            SV_SNIPER_3,        _______
     ),
 
     // [_TMP] = LAYOUT(
@@ -202,7 +202,7 @@ void keyboard_post_init_user(void) {
         global_saved_values.auto_mouse = true;
         global_saved_values.left_dpi_index = MOUSE_DPI_200;
         global_saved_values.right_dpi_index = MOUSE_DPI_800;
-        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_200;
+        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_400;
 
         write_eeprom_kb();
         set_dpi_from_eeprom();
