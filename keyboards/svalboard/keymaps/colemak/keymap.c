@@ -8,6 +8,7 @@
 #include "eeprom.h"
 #include "svalboard.h"
 
+#include "custom_keys.h"
 #include "hrm.h"
 #include "keys.h"
 #include "layers.h"
@@ -18,7 +19,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*     Center           North               East                South               West                Double*/
         /*R1*/ HRM_N,           KC_L,               KC_MINS,            KC_M,               KC_H,               XXXXXXX,
         /*R2*/ HRM_E,           KC_U,               KC_EQL,             KC_COMMA,           KC_J,               XXXXXXX,
-        /*R3*/ HRM_I,           KC_Y,               KC_EXLM,            KC_DOT,             KC_K,               XXXXXXX,
+        /*R3*/ HRM_I,           KC_Y,               CK_EXLM,            KC_DOT,             KC_K,               XXXXXXX,
         /*R4*/ HRM_O,           KC_SCLN,            KC_RBRC,            KC_SLSH,            KC_RPRN,            XXXXXXX,
 
         /*L1*/ HRM_T,           KC_P,               KC_G,               KC_D,               KC_QUOT,            XXXXXXX,
@@ -28,7 +29,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ LT_ENT,          KC_SPC,             KC_ESC,             MO(_NAV),           KC_HYPR,            XXXXXXX,
-        /*LT*/ LT_TAB,          KC_BSPC,            CW_TOGG,            CKC_GAME,           KC_MEH,             XXXXXXX
+        /*LT*/ LT_TAB,          CK_BSPC,            CW_TOGG,            KC_TAB,             KC_MEH,             XXXXXXX
     ),
 
     [_GAME1] = LAYOUT(
@@ -110,11 +111,11 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L1*/ KC_LCTL,         KC_WREF,            _______,            LCTL(KC_V),         _______,            XXXXXXX,
         /*L2*/ KC_LSFT,         KC_WBAK,            _______,            LCTL(KC_C),         _______,            XXXXXXX,
         /*L3*/ KC_LALT,         KC_WFWD,            _______,            LCTL(KC_X),         _______,            XXXXXXX,
-        /*L4*/ KC_LGUI,         _______,            _______,            TG(_MEDIA),         _______,            XXXXXXX,
+        /*L4*/ KC_LGUI,         _______,            _______,            TG(_MEDIA),         TG(_SYS),           XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         _______,            _______,            _______,            _______,            _______,
-        /*LT*/ _______,         _______,            _______,            _______,            _______,            _______
+        /*LT*/ _______,         _______,            _______,            TO(_GAME1),         _______,            _______
     ),
 
     [_MEDIA] = LAYOUT(
@@ -130,8 +131,8 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
+        /*RT*/ TO(_BASE),       XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*LT*/ TO(_BASE),       XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX
     ),
 
     [_SYS] = LAYOUT(
@@ -147,25 +148,25 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*L4*/ KC_PWR,          XXXXXXX,            XXXXXXX,            KC_SLEP,            XXXXXXX,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ SV_SOUT,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE)
+        /*RT*/ TO(_BASE),       XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*LT*/ TO(_BASE),       SV_SOUT,            HRM_TOGGLE,         XXXXXXX,            XXXXXXX,            XXXXXXX
     ),
 
     [_MBO] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ MS_BTN1,         _______,            _______,            _______,            _______,            _______,
-        /*R2*/ MS_BTN2,         _______,            _______,            _______,            _______,            _______,
-        /*R3*/ MS_BTN3,         _______,            _______,            _______,            _______,            _______,
-        /*R4*/ MS_BTN4,         _______,            _______,            _______,            _______,            _______,
+        /*R1*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*R2*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*R3*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*R4*/ _______,         _______,            _______,            _______,            _______,            _______,
 
-        /*L1*/ MS_BTN1,         _______,            _______,            _______,            _______,            _______,
-        /*L2*/ MS_BTN2,         _______,            _______,            _______,            _______,            _______,
-        /*L3*/ MS_BTN3,         _______,            _______,            _______,            _______,            _______,
-        /*L4*/ MS_BTN4,         _______,            _______,            _______,            _______,            _______,
+        /*L1*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*L2*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*L3*/ _______,         _______,            _______,            _______,            _______,            _______,
+        /*L4*/ _______,         _______,            _______,            _______,            _______,            _______,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ _______,         _______,            _______,            _______,            SV_SNIPER_3,        _______,
-        /*LT*/ _______,         _______,            _______,            _______,            SV_SNIPER_3,        _______
+        /*RT*/ MS_BTN1,         MS_BTN2,            MS_BTN4,            MS_BTN5,            _______,            _______,
+        /*LT*/ MS_BTN1,         MS_BTN2,            MS_BTN4,            MS_BTN5,            _______,            _______
     ),
 
     // [_TMP] = LAYOUT(
@@ -202,7 +203,7 @@ void keyboard_post_init_user(void) {
         global_saved_values.auto_mouse = true;
         global_saved_values.left_dpi_index = MOUSE_DPI_200;
         global_saved_values.right_dpi_index = MOUSE_DPI_800;
-        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_400;
+        global_saved_values.mh_timer_index = MOUSE_LAYER_TIMEOUT_NONE;
 
         write_eeprom_kb();
         set_dpi_from_eeprom();
@@ -215,6 +216,7 @@ void keyboard_post_init_user(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_hrm(keycode, record)) return false;
     if (!process_macro(keycode, record)) return false;
+    if (!process_custom_key(keycode, record)) return false;
 
     return true;
 }
@@ -243,6 +245,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         }
     }
 
+    sval_set_active_layer(get_highest_layer(state), false);
     return state;
 }
 
@@ -258,11 +261,9 @@ bool caps_word_press_user(uint16_t keycode) {
         case KC_1 ... KC_0:
         case KC_BSPC:
         case KC_DEL:
+        case CK_BSPC:
+        case CK_EXLM:
         case KC_UNDS:
-            return true;
-
-        // allow tap dances to determine caps word continuation.
-        case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
             return true;
 
         default:

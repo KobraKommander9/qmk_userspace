@@ -1,7 +1,14 @@
 #include "hrm.h"
 #include "keys.h"
 #include "persist.h"
-#include "shift.h"
+
+// Keys sent directly from process_hrm never reach Caps Word, so apply its shift here.
+static void caps_word_shift(void) {
+    if (!is_caps_word_on()) return;
+
+    add_weak_mods(MOD_BIT(KC_LSFT));
+    caps_word_reset_idle_timer();
+}
 
 static void hrm_mode_cycle(void) {
     const hrm_mode_t mode = persist_get_hrm_mode();
@@ -83,7 +90,7 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
             if (!hrm_active(HRM_HAND_LEFT) && !record->tap.count) {
                 uint16_t kc = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
                 if (record->event.pressed) {
-                    break_caps_word(kc);
+                    caps_word_shift();
                     register_code(kc);
                 } else {
                     unregister_code(kc);
@@ -102,7 +109,7 @@ bool process_hrm(uint16_t keycode, keyrecord_t *record) {
             if (!hrm_active(HRM_HAND_RIGHT) && !record->tap.count) {
                 uint16_t kc = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
                 if (record->event.pressed) {
-                    break_caps_word(kc);
+                    caps_word_shift();
                     register_code(kc);
                 } else {
                     unregister_code(kc);

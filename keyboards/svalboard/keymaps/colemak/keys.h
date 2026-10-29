@@ -1,6 +1,5 @@
 #pragma once
 
-#include "tap_dance.h"
 #include "keymap_support.h"
 
 #define SV_LDPU SV_LEFT_DPI_INC
@@ -30,16 +29,6 @@
 #define LT_ENT LT(_NUM,KC_ENT)
 #define LT_TAB LT(_SYM,KC_TAB)
 
-#define CKC_BSPC TD(TDE_CK_BSPC)
-#define CKC_EXLM TD(TDE_CK_EXLM)
-#define CKC_GAME TD(TDE_CK_GAME)
-#define CKC_GRV TD(TDE_CK_GRV)
-#define CKC_HYPR TD(TDE_CK_HYPR)
-#define CKC_MEDIA TD(TDE_CK_MEDIA)
-#define CKC_MEH TD(TDE_CK_MEH)
-#define CKC_SPC TD(TDE_CK_SPC)
-#define CKC_TAB TD(TDE_CK_TAB)
-
 #define RANGE_START QK_KB_20
 enum custom_keycodes {
     // Home Row Mods
@@ -53,6 +42,10 @@ enum custom_keycodes {
     M_WAL,
     M_AND,
     M_OR,
+
+    // Custom keys
+    CK_BSPC,
+    CK_EXLM,
 };
 
 extern void mouse_mode(bool on);
