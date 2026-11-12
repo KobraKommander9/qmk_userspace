@@ -21,3 +21,4 @@ firmware/**/.build/
 compile_commands.json
 .clangd/
 .cache/
+*.elf

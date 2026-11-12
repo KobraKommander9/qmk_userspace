@@ -143,12 +143,12 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
         /*R4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
 
         /*L1*/ XXXXXXX,         KC_BRIU,            XXXXXXX,            KC_BRID,            XXXXXXX,            XXXXXXX,
-        /*L2*/ XXXXXXX,         SV_RDPU,            XXXXXXX,            SV_RDPD,            XXXXXXX,            XXXXXXX,
-        /*L3*/ XXXXXXX,         SV_LDPU,            XXXXXXX,            SV_LDPD,            XXXXXXX,            XXXXXXX,
+        /*L2*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*L3*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*L4*/ KC_PWR,          XXXXXXX,            XXXXXXX,            KC_SLEP,            XXXXXXX,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ TO(_BASE),       XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
+        /*RT*/ TO(_BASE),       SV_SOUT,            XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,
         /*LT*/ TO(_BASE),       SV_SOUT,            HRM_TOGGLE,         XXXXXXX,            XXXXXXX,            XXXXXXX
     ),
 
@@ -223,6 +223,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     static bool gaming = false;
+    static uint8_t shown_layer = UINT8_MAX;
     static bool saved_auto_mouse;
     bool game_layer = layer_state_cmp(state, _GAME1) || layer_state_cmp(state, _GAME2);
 
@@ -245,7 +246,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         }
     }
 
-    sval_set_active_layer(get_highest_layer(state), false);
+    // Pointer motion re-applies the mouse layer on every report; only repaint on a change.
+    uint8_t top = get_highest_layer(state);
+    if (top != shown_layer) {
+        shown_layer = top;
+        sval_set_active_layer(top, false);
+    }
+
     return state;
 }
 
