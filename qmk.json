@@ -2,7 +2,7 @@
     "userspace_version": "1.1",
     "build_targets": [
         ["zsa/moonlander", "colemak"],
-        ["svalboard/azoteq", "colemak"],
-        ["svalboard/trackball", "colemak"]
+        ["svalboard/left", "colemak"],
+        ["svalboard/right", "colemak"]
     ]
 }

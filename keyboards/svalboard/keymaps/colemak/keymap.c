@@ -278,14 +278,14 @@ bool caps_word_press_user(uint16_t keycode) {
     }
 }
 
-bool has_user_tapping_term(uint16_t keycode, keyrecord_t *record) {
-    return is_hrm_keycode(keycode);
-}
-
-uint16_t get_tapping_term_user(uint16_t keycode, keyrecord_t *record) {
+uint16_t get_tapping_term_sval(uint16_t keycode, keyrecord_t *record) {
     if (is_hrm_keycode(keycode)) {
         return get_hrm_tapping_term(keycode, record);
     }
 
-    return TAPPING_TERM;
+    return 0;
+}
+
+int8_t get_permissive_hold_sval(uint16_t keycode, keyrecord_t *record) {
+    return is_hrm_keycode(keycode) ? 0 : -1;
 }

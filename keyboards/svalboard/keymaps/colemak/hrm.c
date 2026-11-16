@@ -1,6 +1,7 @@
 #include "hrm.h"
 #include "keys.h"
 #include "persist.h"
+#include "sval_qmk_settings.h"
 
 // Keys sent directly from process_hrm never reach Caps Word, so apply its shift here.
 static void caps_word_shift(void) {
@@ -29,25 +30,27 @@ static void hrm_mode_toggle(void) {
 // ----------------------------------------------------------------------------
 
 uint16_t get_hrm_tapping_term(uint16_t keycode, keyrecord_t* record) {
+    const uint16_t term = sval_get_tapping_term();
+
     switch (keycode) {
         case HRM_A:
         case HRM_O:
-            return TAPPING_TERM + 30;
+            return term + 30;
 
         case HRM_R:
         case HRM_I:
-            return TAPPING_TERM + 25;
+            return term + 25;
 
         case HRM_S:
         case HRM_E:
-            return TAPPING_TERM - 10;
+            return term - 10;
 
         case HRM_T:
         case HRM_N:
-            return TAPPING_TERM + 15;
+            return term + 15;
     }
 
-    return TAPPING_TERM;
+    return term;
 }
 
 bool hrm_active(hrm_hand_t hand) {
