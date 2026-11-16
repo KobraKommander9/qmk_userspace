@@ -229,8 +229,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
     // set_right_dpi doesn't persist, so leaving restores the saved DPI.
     if (game_layer != gaming) {
-        gaming = game_layer;
-        if (gaming) {
+        if (game_layer) {
             saved_auto_mouse = global_saved_values.auto_mouse;
             // mouse_mode is a no-op once auto_mouse is off, and its nested
             // layer_off is overwritten by the state returned here.
@@ -244,6 +243,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             write_eeprom_kb();
             set_dpi_from_eeprom();
         }
+        gaming = game_layer;
     }
 
     // Pointer motion re-applies the mouse layer on every report; only repaint on a change.
