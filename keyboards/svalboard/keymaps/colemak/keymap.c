@@ -34,19 +34,19 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
     [_GAME1] = LAYOUT(
         /*     Center           North               East                South               West                Double*/
-        /*R1*/ KC_LEFT,         XXXXXXX,            XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
+        /*R1*/ KC_LEFT,         KC_M,               XXXXXXX,            KC_1,               XXXXXXX,            XXXXXXX,
         /*R2*/ KC_DOWN,         KC_UP,              XXXXXXX,            KC_2,               XXXXXXX,            XXXXXXX,
-        /*R3*/ KC_RIGHT,        XXXXXXX,            XXXXXXX,            KC_3,               XXXXXXX,            XXXXXXX,
-        /*R4*/ XXXXXXX,         XXXXXXX,            XXXXXXX,            KC_4,               XXXXXXX,            XXXXXXX,
+        /*R3*/ KC_RIGHT,        KC_I,               XXXXXXX,            KC_3,               XXXXXXX,            XXXXXXX,
+        /*R4*/ KC_ESC,          KC_ENT,             XXXXXXX,            KC_4,               XXXXXXX,            XXXXXXX,
 
         /*L1*/ KC_D,            KC_E,               KC_V,               KC_F,               KC_G,               XXXXXXX,
         /*L2*/ KC_W,            KC_C,               KC_R,               KC_S,               KC_H,               XXXXXXX,
         /*L3*/ KC_A,            KC_Q,               KC_X,               KC_Z,               KC_B,               XXXXXXX,
-        /*L4*/ KC_SPC,          KC_TAB,             MS_BTN2,            KC_LCTL,            KC_LSFT,            XXXXXXX,
+        /*L4*/ KC_SPC,          KC_TAB,             XXXXXXX,            KC_LCTL,            KC_LSFT,            XXXXXXX,
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
-        /*RT*/ KC_LCTL,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
-        /*LT*/ MS_BTN1,         XXXXXXX,            KC_ESC,             SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
+        /*RT*/ MS_BTN1,         XXXXXXX,            XXXXXXX,            XXXXXXX,            XXXXXXX,            TO(_BASE),
+        /*LT*/ MS_BTN2,         MS_WHLD,            MS_WHLU,            SV_SNIPER_5,        MO(_GAME2),         TO(_BASE)
     ),
 
     [_GAME2] = LAYOUT(
@@ -63,7 +63,7 @@ const uint16_t PROGMEM keymaps[DYNAMIC_KEYMAP_LAYER_COUNT][MATRIX_ROWS][MATRIX_C
 
         /*     Down             Pad                 Up                  Nail                Knuckle             DoubleDown*/
         /*RT*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX,
-        /*LT*/ _______,         XXXXXXX,            _______,            _______,            _______,            XXXXXXX
+        /*LT*/ _______,         _______,            _______,            _______,            _______,            XXXXXXX
     ),
 
     [_SYM] = LAYOUT(
